@@ -1,0 +1,6 @@
+## SECTION=shell_and_console
+config SETSERIAL
+	tristate
+	prompt "setserial"
+	help
+	  setserial - get/set Linux serial port information

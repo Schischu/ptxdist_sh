@@ -1,0 +1,26 @@
+## SECTION=shell_and_console
+
+menuconfig ACPID
+	tristate
+	select BUSYBOX_START_STOP_DAEMON if ACPID_STARTSCRIPT
+	prompt "acpid                         "
+	help
+	 a configurable ACPI policy daemon for Linux
+
+if ACPID
+
+config ACPID_STARTSCRIPT
+	bool
+	default y
+	select BUSYBOX_START_STOP_DAEMON if BUSYBOX
+	select BUSYBOX_FEATURE_START_STOP_DAEMON_LONG_OPTIONS if BUSYBOX_START_STOP_DAEMON
+	select BUSYBOX_FEATURE_START_STOP_DAEMON_FANCY if BUSYBOX_START_STOP_DAEMON
+	select ROOTFS_VAR_RUN
+	prompt "install /etc/init.d/acpid"
+
+config ACPID_POWEROFF
+	bool
+	default y
+	prompt "install /etc/acpi/events/power_button"
+endif
+

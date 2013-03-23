@@ -1,0 +1,71 @@
+## SECTION=shell_and_console
+
+menuconfig SYSTEMD
+	tristate
+	select HOST_INTLTOOL
+	select HOST_GPERF
+	select ROOTFS_RUN
+	select LIBC_PTHREAD
+	select LIBC_RT
+	select LIBC_DL
+	select DBUS
+	select LIBCAP
+	select UDEV		if RUNTIME
+	select UDEV_LIBUDEV
+	select MACHINE_ID	if RUNTIME
+	select DBUS_PYTHON	if SYSTEMD_ANALYZE && RUNTIME
+	select TCPWRAPPER	if SYSTEMD_TCPWRAP
+	select XZ		if SYSTEMD_XZ
+	select LIBSELINUX	if GLOBAL_SELINUX
+	# for udev:
+	select ROOTFS_DEV
+	select LIBKMOD
+	select LIBBLKID
+	select GLIB		if UDEV_LIBGUDEV
+	select PCIUTILS		if UDEV_PERSISTENT_PCI && RUNTIME
+	select USBUTILS		if UDEV_PERSISTENT_USB && RUNTIME
+	prompt "systemd                       "
+	help
+	  systemd is a system and session manager for Linux, compatible with SysV
+	  and LSB init scripts. systemd provides aggressive parallelization
+	  capabilities, uses socket and D-Bus activation for starting services,
+	  offers on-demand starting of daemons, keeps track of processes using
+	  Linux cgroups, supports snapshotting and restoring of the system state,
+	  maintains mount and automount points and implements an elaborate
+	  transactional dependency-based service control logic. It can work as a
+	  drop-in replacement for sysvinit.
+
+	  http://www.freedesktop.org/wiki/Software/systemd
+
+if SYSTEMD
+
+config SYSTEMD_TCPWRAP
+	bool
+	prompt "TCP wrappers support"
+
+config SYSTEMD_VCONSOLE
+	bool
+	prompt "virtual console support"
+
+config SYSTEMD_XZ
+	bool
+	prompt "XZ compressed journal support"
+
+config SYSTEMD_DISABLE_RANDOM_SEED
+	bool
+	prompt "disable random seed services"
+	help
+	  Disable service files to load/save the random seed during
+	  startup/shutdown.
+	  This option is for systems with read-only rootfs, where writing
+	  the random seed is not possible.
+	  Warning: enabling this option may be insecure.
+
+config SYSTEMD_ANALYZE
+	bool
+	prompt "systemd-analyze"
+	help
+	  Install the systemd-analyze tool. This feature requires python.
+
+endif
+

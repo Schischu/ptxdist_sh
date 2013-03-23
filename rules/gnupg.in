@@ -1,0 +1,17 @@
+## SECTION=applications
+config GNUPG
+	tristate
+	prompt "gnupg"
+	select LIBC_RESOLV
+	select GCCLIBS_GCC_S
+	select LIBASSUAN
+	select LIBGCRYPT
+	select LIBKSBA
+	select READLINE
+	select ZLIB
+	help
+	  GnuPG - The GNU Privacy Guard suite of programs
+
+	  GnuPG  is  a  set  of  programs for public key encryption
+	  and digital signatures.  The program most users will want
+	  to use is the OpenPGP command line tool, named gpg.

@@ -1,0 +1,7 @@
+## SECTION=system_libraries
+
+config LIBJPEG
+	tristate
+	prompt "libjpeg"
+	help
+	  libjpeg is a library for handling the JPEG (JFIF) image format.

@@ -1,0 +1,26 @@
+## SECTION=shell_and_console
+
+menuconfig HAL
+	tristate
+	select UDEV
+	select EXPAT
+	select DBUS
+	select GLIB
+	select DBUS_GLIB
+	select LIBBLKID
+	select POLICYKIT	if HAL_POLKIT
+	select CONSOLEKIT	if HAL_POLKIT
+	prompt "hal                           "
+	help
+	  hal is a dbus service which provides userspace access for all
+	  kinds of hardware devices.
+
+if HAL
+
+config HAL_POLKIT
+	bool
+	prompt "policy kit support"
+	help
+	  Enable PolicyKit usage, which will also select ConsoleKit
+
+endif

@@ -1,0 +1,4 @@
+## SECTION=crosstools
+
+config CROSS_NASM
+	bool

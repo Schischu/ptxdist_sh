@@ -1,0 +1,10 @@
+## SECTION=hosttools_noprompt
+
+config HOST_LIBICONV
+	tristate
+	default ALLYES
+	help
+	  libiconv converts traditional character encodings
+	  to/from UNICODE. It is for you if your application
+	  needs to support multiple character encodings, but
+	  that support lacks from your system.

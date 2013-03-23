@@ -1,0 +1,60 @@
+#
+# platforms/Kconfig: main menu structure for platform configuration
+#
+
+mainmenu "PTXdist $PLATFORMCONFIG_VERSION"
+
+source "platforms/ptxdist-version.in"
+source "rules/ptxdist-dgen.in"
+
+config _platformconfig_MAGIC__
+        bool
+        default y
+
+
+comment "------------------------------------"
+comment "Target Platform Configuration "
+comment "------------------------------------"
+
+config PLATFORM
+	prompt "platform name"
+	string
+	help
+	  This string identifies the platform. You should give a concise name
+	  here. But if you do not have multiple platforms in this project and
+	  you want a ptxdist-1 behaviour (less or more flat directories), keep
+	  this entry empty.
+
+config PLATFORM_VERSION
+	prompt "platform version"
+	string
+	default "-trunk"
+	help
+	  This is the revision of the platform.
+	  The string is supposed to start with an "-".
+
+source "platforms/architecture.in"
+source "platforms/kernel.in"
+source "platforms/dtc.in"
+source "platforms/console.in"
+
+menu "extra kernel                  "
+source "generated/kernel.in"
+endmenu
+
+menu "bootloaders                   "
+source "generated/bootloader.in"
+endmenu
+
+
+source "platforms/flash.in"
+
+menu "image creation options        "
+source "generated/image.in"
+endmenu
+
+menu "new image creation options    "
+source "generated/image2.in"
+endmenu
+
+source "platforms/hosttools.in"

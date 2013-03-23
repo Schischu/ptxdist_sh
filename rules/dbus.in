@@ -1,0 +1,136 @@
+## SECTION=middleware
+
+menuconfig DBUS
+	tristate
+	prompt "dbus                          "
+	select EXPAT		if DBUS_XML_EXPAT
+	select LIBXML2		if DBUS_XML_LIBXML2
+	select XORG_LIB_X11	if DBUS_X
+	select MACHINE_ID	if RUNTIME
+	select LIBC_PTHREAD
+	select LIBC_RT
+	help
+	  D-Bus is a message bus, used for sending messages between
+	  applications. Conceptually, it fits somewhere in between raw
+	  sockets and CORBA in terms of complexity.
+
+	  D-Bus supports broadcast messages, asynchronous messages
+	  (thus decreasing latency), authentication, and more. It is
+	  designed to be low-overhead; messages are sent using a
+	  binary protocol, not using XML. D-Bus also supports a method
+	  call mapping for its messages, but it is not required; this
+	  makes using the system quite simple.
+
+	  It comes with several bindings, including GLib, Python, Qt
+	  and Java.
+
+if DBUS
+
+config DBUS_SELINUX
+	prompt "selinux support [BROKEN]"
+	depends on BROKEN
+	bool
+
+choice
+	prompt "xml library       "
+	default DBUS_XML_EXPAT
+
+	config DBUS_XML_EXPAT
+		bool
+		prompt "expat  "
+
+	config DBUS_XML_LIBXML2
+		bool
+		prompt "libxml2"
+endchoice
+
+config DBUS_USER
+	string
+	prompt "user for running the dbus daemon"
+	default "messagebus"
+	help
+	  Enter the user name to run the D-Bus daemon with. The PTXdist
+	  standard configuration has only root, so if you want to use
+	  the dbus default user "messagebus" you have to create a
+	  related user yourself.
+
+config DBUS_X
+	bool
+	prompt "enable X support"
+	help
+	  Enable this option to build dbus with support for X.
+
+config DBUS_SYSTEM_CONF
+	bool
+	prompt "install /etc/dbus-1/system.conf"
+	default y
+	help
+	  Installs (if present) the
+	  "./projectroot/etc/dbus-1/system.conf" file from your
+	  workspace, otherwise a generic one from the ptxdist
+	  directory.
+
+config DBUS_SESSION_CONF
+	bool
+	prompt "install /etc/dbus-1/session.conf"
+	default y
+	help
+	  Installs (if present) the
+	  "./projectroot/etc/dbus-1/session.conf" file from your
+	  workspace, otherwise a generic one from the ptxdist
+	  directory.
+
+#   --enable-tests          enable unit test code
+#   --enable-ansi           enable -ansi -pedantic gcc flags
+#   --enable-verbose-mode   support verbose debug mode
+#   --enable-asserts        include assertion checks
+#   --enable-checks         include sanity checks on public API
+#   --enable-xml-docs       build XML documentation (requires xmlto)
+#   --enable-doxygen-docs   build DOXYGEN documentation (requires Doxygen)
+#   --enable-gcov           compile with coverage profiling instrumentation (gcc
+#                           only)
+#   --enable-abstract-sockets
+#                           use abstract socket namespace (linux only)
+#   --enable-selinux        build with SELinux support
+#   --enable-dnotify        build with dnotify support (linux only)
+#   --enable-kqueue         build with kqueue support
+#   --enable-console-owner-file
+#                           enable console owner file
+#   --enable-shared[=PKGS]
+#                           build shared libraries [default=yes]
+#   --enable-static[=PKGS]
+#                           build static libraries [default=yes]
+#   --enable-fast-install[=PKGS]
+#                           optimize for fast installation [default=yes]
+#   --with-xml=libxml/expat XML library to use
+#   --with-init-scripts=redhat
+#                           Style of init scripts to install
+#   --with-session-socket-dir=dirname
+#                           Where to put sockets for the per-login-session
+#                           message bus
+#   --with-test-socket-dir=dirname
+#                           Where to put sockets for make check
+#   --with-system-pid-file=pidfile
+#                           PID file for systemwide daemon
+#   --with-system-socket=filename
+#                           UNIX domain socket for systemwide daemon
+#   --with-console-auth-dir=dirname
+#                           directory to check for console ownerhip
+#   --with-console-owner-file=filename
+#                           file whose owner determines current console owner
+#   --with-dbus-daemondir=dirname
+#                           Directory for installing the DBUS daemon
+#   --with-x                use the X Window System
+
+config DBUS_STARTSCRIPT
+	bool
+	default y
+	prompt "install /etc/init.d/dbus"
+
+config DBUS_SYSTEMD_UNIT
+	bool
+	default y
+	depends on SYSTEMD
+	prompt "install systemd unit files for dbus"
+
+endif

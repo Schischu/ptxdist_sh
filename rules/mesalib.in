@@ -1,0 +1,108 @@
+## SECTION=multimedia_xorg_support_libs
+
+menuconfig MESALIB
+	tristate
+	prompt "mesa                          "
+	select LIBDRM
+	select DRI2PROTO
+	select HOST_MESALIB
+	select HOST_MAKEDEPEND
+	select XORG_LIB_X11		if MESALIB_DRI
+	select XORG_LIB_XEXT		if MESALIB_DRI || MESALIB_XLIB_GLX
+	select XORG_LIB_XXF86VM		if MESALIB_DRI
+	select XORG_LIB_XDAMAGE		if MESALIB_DRI
+	select XORG_LIB_XFIXES		if MESALIB_DRI
+	select XORG_PROTO_GL		if MESALIB_DRI
+	select EXPAT			if MESALIB_DRI
+	select GCCLIBS
+	select GCCLIBS_CXX
+	help
+	  Mesa is a 3-D graphics library with an API which is very
+	  similar to that of OpenGL. See the project homepage for
+	  details:
+
+		http://www.mesa3d.org/
+
+if MESALIB
+
+config MESALIB_DRI
+	prompt "DRI modules"
+	bool
+
+config MESALIB_GLX
+	prompt "GLX library"
+	bool
+
+config MESALIB_XLIB_GLX
+	depends on MESALIB_GLX
+	default !MESALIB_DRI && !MESALIB_OSMESA
+	bool
+
+config MESALIB_OSMESA
+	prompt "OSMesa library"
+	bool
+
+if MESALIB_DRI
+
+config MESALIB_DRI_SWRAST
+	bool
+	prompt "Software Rasterizer           "
+
+menuconfig MESALIB_DRI_INTEL
+	bool
+	prompt "Intel DRI drivers             "
+
+if MESALIB_DRI_INTEL
+
+config MESALIB_DRI_I915
+	bool
+	prompt "i915"
+
+config MESALIB_DRI_I965
+	bool
+	prompt "i965"
+
+endif
+
+menuconfig MESALIB_DRI_ATI
+	bool
+	prompt "Ati DRI drivers               "
+
+if MESALIB_DRI_ATI
+
+config MESALIB_DRI_R200
+	bool
+	# needs libdrm_radeon
+	depends on BROKEN
+	prompt "r200"
+
+config MESALIB_DRI_R300
+	bool
+	prompt "r300"
+
+config MESALIB_DRI_R600
+	bool
+	prompt "r600"
+
+config MESALIB_DRI_RADEON
+	bool
+	# needs libdrm_radeon
+	depends on BROKEN
+	prompt "radeon"
+
+endif
+
+menu "Other DRI Drivers             "
+
+config MESALIB_DRI_NOUVEAU
+	bool
+	# need libdrm_nouveau
+	depends on BROKEN
+	prompt "nouveau"
+
+endmenu
+
+endif
+
+endif
+

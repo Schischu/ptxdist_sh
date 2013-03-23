@@ -1,0 +1,121 @@
+## SECTION=networking
+menuconfig NET_SNMP
+	tristate
+	prompt "net-snmp                      "
+	select LIBC_M
+	select GCCLIBS_GCC_S	if NET_SNMP_AGENT
+	select LIBC_DL		if NET_SNMP_AGENT || NET_SNMP_APPLICATIONS
+	select LIBNL		if NET_SNMP_AGENT || NET_SNMP_APPLICATIONS
+	select NET_SNMP_MD5
+#	^ build fix for 5.6.1 (see http://sourceforge.net/tracker/index.php?func=detail&aid=3184697&group_id=12694&atid=112694)
+
+if NET_SNMP
+
+config NET_SNMP_MINI_AGENT
+	bool
+	default y
+	prompt "minimal agent"
+
+config NET_SNMP_AGENT
+	bool
+	prompt "agent (snmpd)"
+
+config NET_SNMP_APPLICATIONS
+	bool
+	prompt "apps (snmpget, ...)"
+
+config NET_SNMP_SCRIPTS
+	bool
+	prompt "scripts (mib2c, ...)"
+
+config NET_SNMP_MIBS
+	bool
+	prompt "mib files"
+
+config NET_SNMP_MIB_LOADING
+	bool
+	prompt "include code that parses and manipulates mib files"
+
+config NET_SNMP_SNMPV1
+	bool
+	prompt "support for SNMPv1"
+
+config NET_SNMP_SNMPV2C
+	bool
+	prompt "support for SNMPv2c"
+
+config NET_SNMP_DES
+	bool
+	prompt "DES encryption"
+
+config NET_SNMP_MD5
+	bool
+	prompt "MD5 authentication"
+
+config NET_SNMP_SNMPTRAPD
+	bool
+	prompt "agentx subagent code in snmptrapd"
+
+config NET_SNMP_LOCAL_SMUX
+	bool
+	prompt "restrict SMUX connections to localhost (by default)"
+
+choice
+	prompt "debugging"
+	default NET_SNMP_DEFAULT_DEBUGGING
+
+config NET_SNMP_DEFAULT_DEBUGGING
+	bool
+	prompt "default"
+	help
+	  Use default debugging, selectable via -D on the command-line.
+
+config NET_SNMP_FORCE_DEBUGGING
+	bool
+	prompt "enforce"
+	help
+	  Always print all debugging even when not specified on command-line.
+
+config NET_SNMP_STRIP_DEBUGGING
+	bool
+	prompt "strip"
+	help
+	  Strip debugging code entirely.
+
+endchoice
+
+config NET_SNMP_DEVELOPER
+	bool
+	prompt "super-duper-extra-compile-warnings using gcc"
+
+config NET_SNMP_DEFAULT_VERSION
+	prompt "default SNMP version: 1, 2 (for SNMPv2c), or 3"
+	string
+	default	"3"
+
+config NET_SNMP_LOGFILE
+	prompt "logfile location"
+	string
+	default	"/var/log/snmpd.log"
+
+config NET_SNMP_PERSISTENT_DIR
+	prompt "persistent data storage directory"
+	string
+	default	"/var/net-snmp"
+
+config NET_SNMP_MIB_MODULES
+	prompt "additional mib modules"
+	string
+	default	""
+
+config NET_SNMP_DEFAULT_MIBS
+	prompt "default mib id's to read"
+	string
+	default	""
+
+config NET_SNMP_MIB_INSTALL_DIR
+	prompt "directory to install mib files"
+	string
+	default	"/usr/share/snmp/mibs"
+
+endif

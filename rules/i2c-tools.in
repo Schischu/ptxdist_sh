@@ -1,0 +1,8 @@
+## SECTION=shell_and_console
+config I2C_TOOLS
+	tristate
+	prompt "i2c-tools"
+	help
+	  The userland i2c tools from lm-sensors. They provide generic access
+	  to i2c devices.
+

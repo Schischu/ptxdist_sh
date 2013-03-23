@@ -1,0 +1,69 @@
+## SECTION=multimedia_gtk
+
+menuconfig CAIRO
+	tristate
+	select GCCLIBS_GCC_S
+	select XORG_LIB_XT	if CAIRO_XLIB && !GTK_TARGET_HOST_X11
+	select XORG_LIB_XRENDER	if CAIRO_XLIB && !GTK_TARGET_HOST_X11
+
+	select GLIB		if CAIRO_GOBJECT
+
+	select DIRECTFB		if CAIRO_DIRECTFB
+
+	select FREETYPE		if CAIRO_FREETYPE
+	select FONTCONFIG	if CAIRO_FREETYPE
+
+	select LIBPNG		if CAIRO_PNG
+
+	select PIXMAN
+
+	prompt "cairo                         "
+	help
+	  Cairo is a software library used to provide
+	  a vector graphics based, device-independent
+	  API for software developers.
+
+if CAIRO
+
+config CAIRO_GOBJECT
+	bool
+
+config CAIRO_PS
+	bool
+	prompt "PostScript backend"
+
+config CAIRO_PDF
+	bool
+	prompt "PDF backend"
+
+
+config CAIRO_XLIB
+	bool
+	prompt "Xlib backend"
+	select CAIRO_FREETYPE
+
+config CAIRO_DIRECTFB
+	bool
+	prompt "directfb backend"
+	select CAIRO_FREETYPE
+
+config CAIRO_WIN32
+	bool
+	prompt "Win32 backend"
+	help
+	  Build cairo with the Win 32 backend. Makes only sense on mingw.
+
+config CAIRO_SVG
+	bool
+	prompt "SVG backend"
+	select CAIRO_PNG
+
+config CAIRO_FREETYPE
+	bool
+	prompt "Freetype font backend"
+
+config CAIRO_PNG
+	bool
+	prompt "PNG support"
+
+endif

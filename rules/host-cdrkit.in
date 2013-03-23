@@ -1,0 +1,11 @@
+## SECTION=hosttools_noprompt
+
+config HOST_CDRKIT
+	tristate
+	select HOST_CMAKE
+	select HOST_BZIP2
+	select HOST_LIBCAP
+	select HOST_ZLIB
+	default ALLYES
+	help
+	  command-line CD/DVD recorder software

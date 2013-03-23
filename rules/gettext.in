@@ -1,0 +1,22 @@
+## SECTION=system_libraries
+menuconfig GETTEXT
+	tristate
+	prompt "gettext (gnu)                 "
+	select LIBC_M
+	select LIBC_DL
+	select GCCLIBS_CXX
+	select GCCLIBS_GCC_S
+	help
+	  The gettext program translates a natural language
+	  message into the user's language, by looking up
+	  the translation in a message catalog.
+
+if GETTEXT
+
+config GETTEXT_LIBINTL
+	bool
+	prompt "install gnu libintl"
+	help
+	  libintl is the GNU internationalization runtime library.
+
+endif

@@ -1,0 +1,46 @@
+## SECTION=networking
+
+menuconfig NETWORKMANAGER
+	tristate
+	select DHCP			if RUNTIME
+	select DHCP_CLIENT
+	select WIRELESS
+	select WIRELESS_SHARED
+	select UDEV
+	select UDEV_LIBGUDEV
+	select DBUS_GLIB
+	select LIBNL
+	select LIBUUID
+	select WPA_SUPPLICANT		if RUNTIME
+	select GNUTLS
+	select HOST_INTLTOOL
+	select DBUS_PYTHON		if NETWORKMANAGER_EXAMPLES && RUNTIME
+	select IPTABLES			if RUNTIME
+# for the 'iptables' tool
+	select IPTABLES_IPV4
+	prompt "networkmanager                "
+	help
+	  NetworkManager is a tool to automate network configuration as far as
+	  possible. The project web site is here:
+
+	  http://projects.gnome.org/NetworkManager/
+
+if NETWORKMANAGER
+
+config NETWORKMANAGER_STARTSCRIPT
+	bool
+	default y
+	prompt "install /etc/init.d/NetworkManager"
+
+config NETWORKMANAGER_SYSTEMD_UNIT
+	bool
+	default y
+	depends on SYSTEMD
+	prompt "install systemd unit files for Network Manager"
+
+config NETWORKMANAGER_EXAMPLES
+	bool
+	default n
+	prompt "install examples for Network Manager"
+
+endif
