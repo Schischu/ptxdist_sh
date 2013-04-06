@@ -35,6 +35,11 @@ config KERNEL_VERSION
 	string
 	default "2.6.33"
 
+config KERNEL_LOCALVERSION
+	prompt "kernel localversion"
+	string
+	default ""
+
 config KERNEL_MD5
 	prompt "kernel source md5sum"
 	string
