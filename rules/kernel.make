@@ -29,7 +29,7 @@ endif
 #
 # Paths and names
 #
-KERNEL			:= linux-$(KERNEL_VERSION)
+KERNEL			:= linux-$(PTXCONF_KERNEL_VERSION)
 KERNEL_MD5		:= $(call remove_quotes,$(PTXCONF_KERNEL_MD5))
 KERNEL_SUFFIX		:= tar.xz
 KERNEL_DIR		:= $(KERNEL_BDIR)/$(KERNEL)

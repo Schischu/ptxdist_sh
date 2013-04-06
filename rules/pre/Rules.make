@@ -133,7 +133,8 @@ CROSS_ENV_PROGS := \
 	$(CROSS_ENV_CPP_FOR_BUILD) \
 	$(CROSS_ENV_LINK_FOR_BUILD)
 
-CROSS_LIB_DIR   := $(shell ptxd_get_lib_dir)
+#CROSS_LIB_DIR   := $(shell ptxd_get_lib_dir)
+CROSS_LIB_DIR   := lib
 
 #
 # prepare to use pkg-config with wrapper which takes care of
