@@ -33,8 +33,15 @@ config PLATFORM_VERSION
 	  This is the revision of the platform.
 	  The string is supposed to start with an "-".
 
+source "generated/platform.in"
+
 source "platforms/architecture.in"
 source "platforms/kernel.in"
+
+menu "Linux kernel driver           "
+source "generated/kernel_driver.in"
+endmenu
+
 source "platforms/dtc.in"
 source "platforms/console.in"
 
