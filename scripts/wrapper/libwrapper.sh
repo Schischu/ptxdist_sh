@@ -18,7 +18,10 @@ if [ -z "${PTXDIST_PLATFORMCONFIG}" ]; then
 	. "$(dirname "$0")/env" || exit
 fi
 
-. ${PTXDIST_PLATFORMCONFIG}
+if 
+if [ -e ${PTXDIST_PLATFORMCONFIG} ]; then
+	. ${PTXDIST_PLATFORMCONFIG}
+fi
 
 wrapper_exec() {
 	if [ "${PTXDIST_VERBOSE}" = 1 -a -n "${PTXDIST_FD_LOGFILE}" ]; then
