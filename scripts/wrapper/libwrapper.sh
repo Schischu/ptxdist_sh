@@ -19,7 +19,7 @@ if [ -z "${PTXDIST_PLATFORMCONFIG}" ]; then
 fi
 
 if 
-if [ -e ${PTXDIST_PLATFORMCONFIG} ]; then
+if [ -e "${PTXDIST_PLATFORMCONFIG}" ]; then
 	. ${PTXDIST_PLATFORMCONFIG}
 fi
 
