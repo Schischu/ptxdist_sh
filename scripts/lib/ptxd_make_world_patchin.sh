@@ -36,6 +36,17 @@ ptxd_make_world_patchin_apply_init()
 	fi
     fi
 
+    #series exist create tmp series file
+
+    pkg_patch_platform_series="${pkg_patch_platform_dir}/series"
+    echo "pkg_patch_platform_series: ${pkg_patch_platform_series}" > /dev/stderr
+
+    if [ -e "${pkg_patch_platform_series}" ]; then
+        cp ${pkg_patch_series} ${pkg_patch_platform_dir}/.series
+        cat ${pkg_patch_platform_series} >> ${pkg_patch_platform_dir}/.series
+        pkg_patch_series=${pkg_patch_platform_dir}/.series
+    fi
+
     # decide which tool to use
     if [ "${PTXCONF_SETUP_PATCHIN_GIT}" ] && which git > /dev/null 2>&1; then
 	pkg_patch_tool=git
@@ -189,8 +200,11 @@ ptxd_make_world_patchin_apply_patch()
 	esac
 
 	echo "applying '${patch}'"
-	patch="${pkg_patchin_dir}/.ptxdist/patches/${patch}"
-	"${cat}" "${patch}" | patch "${para}" -N -d "${pkg_patchin_dir}" &&
+	patch_abs="${pkg_patchin_dir}/.ptxdist/patches/${patch}"
+	if [ \! -f "${patch_abs}" ]; then
+	   patch_abs="${pkg_patchin_dir}/.ptxdist/patches_platform/${patch}"
+	fi &&
+	"${cat}" "${patch_abs}" | patch "${para}" -N -d "${pkg_patchin_dir}" &&
 	check_pipe_status || return
 
     done < "${pkg_patchin_dir}/.ptxdist/series" &&
@@ -237,6 +251,10 @@ ptxd_make_world_patchin_apply()
     # containing the patches
     #
     ln -s "${pkg_patch_dir}" "${pkg_patchin_dir}/.ptxdist/patches" &&
+
+    if [ -d "${pkg_patch_platform_dir}" ]; then
+        ln -s "${pkg_patch_platform_dir}" "${pkg_patchin_dir}/.ptxdist/patches_platform"
+    fi &&
 
     # link series file - if not available create it
     if [ -z "${pkg_patch_series}" ]; then
@@ -295,7 +313,9 @@ ptxd_make_world_patchin_apply()
 	    esac
 
 	    if [ \! -f "${pkg_patchin_dir}/.ptxdist/patches/${patch}" ]; then
-		ptxd_bailout "cannot find patch: '${patch}' specified in series file '${pkg_patch_series}'"
+	        if [ \! -f "${pkg_patchin_dir}/.ptxdist/patches_platform/${patch}" ]; then
+	            ptxd_bailout "cannot find patch: '${patch}' specified in series file '${pkg_patch_series}'"
+	        fi
 	    fi
 
 	done < "${pkg_patchin_dir}/.ptxdist/series" &&
@@ -317,10 +337,14 @@ ptxd_make_world_patchin_apply()
     if [ \! -e "${pkg_patchin_dir}/patches" ]; then
 	ln -sf ".ptxdist/patches" "${pkg_patchin_dir}/patches"
     fi || return
+    if [ \! -e "${pkg_patchin_dir}/patches_platform" ]; then
+	ln -sf ".ptxdist/patches_platform" "${pkg_patchin_dir}/patches_platform"
+    fi || return
 
     echo
-    echo "pkg_patch_dir:     '$(ptxd_print_path "${pkg_patch_dir:-<none>}")'"
-    echo "pkg_patch_series:  '$(ptxd_print_path "${pkg_patch_series:-<none>}")'"
+    echo "pkg_patch_dir:          '$(ptxd_print_path "${pkg_patch_dir:-<none>}")'"
+    echo "pkg_patch_platform_dir: '$(ptxd_print_path "${pkg_patch_platform_dir:-<none>}")'"
+    echo "pkg_patch_series:       '$(ptxd_print_path "${pkg_patch_series:-<none>}")'"
     echo
 
     # apply patches if series file is available
@@ -444,6 +468,12 @@ ptxd_make_world_patchin_init()
 	return
     fi
     pkg_patch_dir="${ptxd_reply}"
+
+    pkg_patch_platform_dir=`readlink -e ${PTXDIST_PLATFORMCONFIG}`
+    pkg_patch_platform_dir="`dirname ${pkg_patch_platform_dir}`/patches/${pkg_pkg}"
+
+    echo "pkg_patch_dir: ${pkg_patch_dir}" > /dev/stderr
+    echo "pkg_patch_platform_dir: ${pkg_patch_platform_dir}" > /dev/stderr
 }
 export -f ptxd_make_world_patchin_init
 

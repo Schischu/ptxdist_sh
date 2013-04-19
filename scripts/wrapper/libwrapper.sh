@@ -18,7 +18,6 @@ if [ -z "${PTXDIST_PLATFORMCONFIG}" ]; then
 	. "$(dirname "$0")/env" || exit
 fi
 
-if 
 if [ -e "${PTXDIST_PLATFORMCONFIG}" ]; then
 	. ${PTXDIST_PLATFORMCONFIG}
 fi
