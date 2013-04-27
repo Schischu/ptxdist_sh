@@ -39,7 +39,6 @@ ptxd_make_world_patchin_apply_init()
     #series exist create tmp series file
 
     pkg_patch_platform_series="${pkg_patch_platform_dir}/series"
-    echo "pkg_patch_platform_series: ${pkg_patch_platform_series}" > /dev/stderr
 
     if [ -e "${pkg_patch_platform_series}" ]; then
         cp ${pkg_patch_series} ${pkg_patch_platform_dir}/.series
@@ -471,9 +470,6 @@ ptxd_make_world_patchin_init()
 
     pkg_patch_platform_dir=`readlink -e ${PTXDIST_PLATFORMCONFIG}`
     pkg_patch_platform_dir="`dirname ${pkg_patch_platform_dir}`/patches/${pkg_pkg}"
-
-    echo "pkg_patch_dir: ${pkg_patch_dir}" > /dev/stderr
-    echo "pkg_patch_platform_dir: ${pkg_patch_platform_dir}" > /dev/stderr
 }
 export -f ptxd_make_world_patchin_init
 

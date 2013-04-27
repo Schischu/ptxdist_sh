@@ -199,11 +199,9 @@ ptxd_init_collectionconfig() {
 # out: 'lib' or 'lib64', derived from the ld-{linux,uClibc}.so.? from the compiler toolchain
 #
 ptxd_get_lib_dir() {
-    local dl lib_dir
+    local lib_dir
 
-    dl="$(ptxd_cross_cc_v | \
-	sed -n -e 's/.* -dynamic-linker \([^ ]*\).*/\1/p')"
-    lib_dir="${dl%%/ld*.so.*}"
+    lib_dir="lib"
     echo "${lib_dir#/}"
 }
 export -f ptxd_get_lib_dir
