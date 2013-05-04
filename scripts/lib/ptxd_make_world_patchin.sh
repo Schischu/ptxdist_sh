@@ -38,12 +38,15 @@ ptxd_make_world_patchin_apply_init()
 
     #series exist create tmp series file
 
-    pkg_patch_platform_series="${pkg_patch_platform_dir}/series"
+    if [ "x${pkg_patch_platform_dir}" != "x" ]; then
+        pkg_patch_platform_series="${pkg_patch_platform_dir}/series"
+        #echo "pkg_patch_platform_series: ${pkg_patch_platform_series}" > /dev/stderr
 
-    if [ -e "${pkg_patch_platform_series}" ]; then
-        cp ${pkg_patch_series} ${pkg_patch_platform_dir}/.series
-        cat ${pkg_patch_platform_series} >> ${pkg_patch_platform_dir}/.series
-        pkg_patch_series=${pkg_patch_platform_dir}/.series
+        if [ -e "${pkg_patch_platform_series}" ]; then
+            cp ${pkg_patch_series} ${pkg_patch_platform_dir}/.series
+            cat ${pkg_patch_platform_series} >> ${pkg_patch_platform_dir}/.series
+            pkg_patch_series=${pkg_patch_platform_dir}/.series
+        fi
     fi
 
     # decide which tool to use
@@ -251,8 +254,10 @@ ptxd_make_world_patchin_apply()
     #
     ln -s "${pkg_patch_dir}" "${pkg_patchin_dir}/.ptxdist/patches" &&
 
-    if [ -d "${pkg_patch_platform_dir}" ]; then
-        ln -s "${pkg_patch_platform_dir}" "${pkg_patchin_dir}/.ptxdist/patches_platform"
+    if [ "x${pkg_patch_platform_dir}" != "x" ]; then
+        if [ -d "${pkg_patch_platform_dir}" ]; then
+            ln -s "${pkg_patch_platform_dir}" "${pkg_patchin_dir}/.ptxdist/patches_platform"
+        fi
     fi &&
 
     # link series file - if not available create it
@@ -468,8 +473,12 @@ ptxd_make_world_patchin_init()
     fi
     pkg_patch_dir="${ptxd_reply}"
 
-    pkg_patch_platform_dir=`readlink -e ${PTXDIST_PLATFORMCONFIG}`
-    pkg_patch_platform_dir="`dirname ${pkg_patch_platform_dir}`/patches/${pkg_pkg}"
+    if [ -e "${PTXDIST_PLATFORMCONFIG}" ]; then
+        pkg_patch_platform_dir=`readlink -e ${PTXDIST_PLATFORMCONFIG}`
+        pkg_patch_platform_dir="`dirname ${pkg_patch_platform_dir}`/patches/${pkg_pkg}"
+    else
+        pkg_patch_platform_dir=""
+    fi
 }
 export -f ptxd_make_world_patchin_init
 
