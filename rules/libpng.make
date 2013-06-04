@@ -48,7 +48,7 @@ $(STATEDIR)/libpng.targetinstall:
 	@$(call install_fixup, libpng,AUTHOR,"Robert Schwebel <r.schwebel@pengutronix.de>")
 	@$(call install_fixup, libpng,DESCRIPTION,missing)
 
-	@$(call install_lib, libpng, 0, 0, 0644, libpng12)
+	@$(call install_lib, libpng, 0, 0, 0644, libpng16)
 
 	@$(call install_finish, libpng)
 
