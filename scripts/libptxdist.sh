@@ -15,7 +15,7 @@ PTX_DIALOG_WIDTH=0
 #
 ptxd_dialog_fselect() {
 	local ptr="${1}"
-	local _select="${!1:-${PWD}}"
+	local _select="${!1:-${PWD}}/configs/"
 
 	exec 3>&1
 	exec 4>&1

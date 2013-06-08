@@ -43,7 +43,10 @@ menu_select() {
 #
 menu() {
 	local ptxconfig="$(readlink -f "${PTXDIST_PTXCONFIG}")"
-	ptxconfig="${ptxconfig#${PTXDIST_WORKSPACE}/}"
+	ptxconfig="${ptxconfig#${PTXDIST_WORKSPACE}/configs/}"
+	
+	local collectionconfig="$(readlink -f "${PTXDIST_COLLECTIONCONFIG}")"
+	collectionconfig="${collectionconfig#${PTXDIST_WORKSPACE}/configs/}"
 
 	local -a menu
 	if ! ptxd_get_ptxconf PTXCONF_NO_PLATFORM > /dev/null; then
@@ -83,14 +86,16 @@ menu() {
 		--menu "" 0 0 0 \
 		-- \
 		"menuconfig"		"Configure Software Platform" \
+		"collectionconfig"	"Configure Software Platform Collection" \
 		"${menu[@]}" \
-		"--------------"	"--------------------------------------------" \
-		"select"		"Select Software Platform (${ptxconfig})" \
-		"platform"		"Select Hardware Platform (${platform})" \
-		"--------------"	"--------------------------------------------" \
-		"boardsetup"		"Configure Board Properties" \
+		"----------------"	"-----------------------------------------------------------------------------" \
+		"select"		"Select Software Platform            (${ptxconfig})" \
+		"collection"	"Select Software Platform Collection (${collectionconfig})" \
+		"platform"		"Select Hardware Platform            (${platform})" \
+		"----------------"	"-----------------------------------------------------------------------------" \
+		"boardsetup"	"Configure Board Properties" \
 		"setup"			"Configure User Properties" \
-		"--------------"	"--------------------------------------------" \
+		"----------------"	"-----------------------------------------------------------------------------" \
 		"go"			"Build the project" \
 		"images"		"Build all images" \
 		3>&1 1>&4 \
@@ -101,8 +106,10 @@ menu() {
 
 	case "${cmd}" in
 	menuconfig)	cmd=ptx ;;
+	collectionconfig)	cmd=collection ;;
 	platformconfig)	cmd=platform ;;
 	select)		cmd=ptxconfig ;;
+	collection)	cmd=collectionconfig ;;
 	platform)	cmd=platformconfig ;;
 	boardsetup)	cmd=board ;;
 	setup)		cmd=user ;;
@@ -111,11 +118,11 @@ menu() {
 	PTXDIST_QUIET=1
 
 	case "${cmd}" in
-	platformconfig|ptxconfig)
+	platformconfig|ptxconfig|collectionconfig)
 		menu_select "${cmd}"
 		;;
 
-	ptx|platform|kernel|u-boot-v2|barebox|board|user)
+	ptx|collection|platform|kernel|u-boot-v2|barebox|board|user)
 		do_config menuconfig "${cmd}"
 		# FIXME: reread user config file
 		;;
@@ -835,7 +842,8 @@ Setup and Project Actions:
   menuconfig platform
   platformconfig		configure the platform
 
-  menuconfig collection		configure the collection
+  menuconfig collection
+  collectionconfig		configure the collection
 
   menuconfig barebox		configure the bootloader Barebox
 
@@ -1639,6 +1647,12 @@ parse_second()
 			exit
 			;;
 
+		collectionconfig)
+			do_config menuconfig collection
+			exit ${?}
+			;;
+
+
 		platformconfig)
 			do_config menuconfig platform
 			exit ${?}
@@ -2266,7 +2280,8 @@ setup_platform() {
 	local cfg_file cfg_dir
 	for cfg_file in \
 		"${PTXDIST_PLATFORMCONFIG}" \
-		"${PTXDIST_PTXCONFIG}"; do
+		"${PTXDIST_PTXCONFIG}" \
+		"${PTXDIST_COLLECTIONCONFIG}"; do
 		[ -e "${cfg_file}" ] || continue
 
 		cfg_file="$(readlink -f "${cfg_file}")" || return
