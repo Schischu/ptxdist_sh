@@ -380,6 +380,7 @@ ptxd_init_devpkg()
 ptxd_init_save_wrapper_env() {
     local sysroot="$(ptxd_get_ptxconf PTXCONF_SYSROOT_HOST)"
 
+    mkdir -p ${sysroot}/lib/wrapper
     cat > ${sysroot}/lib/wrapper/env <<- EOF
 	PTXDIST_PLATFORMCONFIG="${PTXDIST_PLATFORMCONFIG}"
 	PTXDIST_CROSS_CPPFLAGS="${PTXDIST_CROSS_CPPFLAGS}"
