@@ -801,6 +801,13 @@ config BUSYBOX_FEATURE_VOLUMEID_FAT
 	help
 	  TODO
 
+config BUSYBOX_FEATURE_VOLUMEID_EXFAT
+	bool "exfat filesystem"
+	default y
+	depends on BUSYBOX_VOLUMEID
+	help
+	  TODO
+
 config BUSYBOX_FEATURE_VOLUMEID_HFS
 	bool "hfs filesystem"
 	default y
@@ -824,6 +831,13 @@ config BUSYBOX_FEATURE_VOLUMEID_JFS
 
 config BUSYBOX_FEATURE_VOLUMEID_XFS
 	bool "xfs filesystem"
+	default y
+	depends on BUSYBOX_VOLUMEID
+	help
+	  TODO
+
+config BUSYBOX_FEATURE_VOLUMEID_NILFS
+	bool "nilfs filesystem"
 	default y
 	depends on BUSYBOX_VOLUMEID
 	help

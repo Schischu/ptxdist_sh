@@ -651,6 +651,12 @@ config BUSYBOX_SHA512SUM
 	help
 	  Compute and check SHA512 message digest
 
+config BUSYBOX_SHA3SUM
+	bool "sha3sum"
+	default y
+	help
+	  Compute and check SHA3 message digest
+
 config BUSYBOX_SLEEP
 	bool "sleep"
 	default y
