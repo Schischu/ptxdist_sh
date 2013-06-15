@@ -113,11 +113,11 @@ config BUSYBOX_FEATURE_LOGREAD_REDUCED_LOCKING
 	  from circular buffer, minimizing semaphore
 	  contention at some minor memory expense.
 
-config FEATURE_KMSG_SYSLOG
+config BUSYBOX_FEATURE_KMSG_SYSLOG
 	bool "Linux kernel printk buffer support"
 	default y
-	depends on SYSLOGD
-	select PLATFORM_LINUX
+	depends on BUSYBOX_SYSLOGD
+	select BUSYBOX_PLATFORM_LINUX
 	help
 	  When you enable this feature, the syslogd utility will
 	  write system log message to the Linux kernel's printk buffer.
