@@ -174,9 +174,14 @@ export -f ptxd_make_world_patchin_apply_git
 #
 ptxd_make_world_patchin_apply_quilt()
 {
+	# Skip empty series
+	if [ -n "$(cat ${pkg_patch_series}.quilt |grep -v '^[#$]')" ]; then
+
     QUILT_SERIES="${pkg_patch_series}.quilt" \
 	QUILT_PATCHES="${pkg_patchin_dir}/.ptxdist" \
 	quilt push -a || ptxd_bailout "quilt returned error"
+
+	fi
 }
 export -f ptxd_make_world_patchin_apply_quilt
 
