@@ -321,6 +321,11 @@ ptxd_kconfig() {
 	    PROJECT \
 	    FULLVERSION
 
+	if [ "${part}" == "collection" ]; then
+		sed -i "s/# //g" .config
+		sed -i "s/ is not set/=m/g" .config
+	fi
+
 	if [ ${retval} -eq 0 -a "${copy_back}" = "true" ]; then
 		cp -- .config "${file_dotconfig}" || return
 		if [ -f .config.old ]; then
