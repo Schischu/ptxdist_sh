@@ -174,7 +174,9 @@ export -f ptxd_make_world_patchin_apply_git
 #
 ptxd_make_world_patchin_apply_quilt()
 {
-    QUILT_PATCHES="${pkg_patchin_dir}/.ptxdist/patches" quilt push -a
+    QUILT_SERIES="${pkg_patch_series}.quilt" \
+	QUILT_PATCHES="${pkg_patchin_dir}/.ptxdist" \
+	quilt push -a || ptxd_bailout "quilt returned error"
 }
 export -f ptxd_make_world_patchin_apply_quilt
 
@@ -296,6 +298,8 @@ ptxd_make_world_patchin_apply()
 	fi
     else
 	ln -s "${pkg_patch_series}" "${pkg_patchin_dir}/.ptxdist/series"
+	# create new series file for quilt
+	echo > "${pkg_patch_series}.quilt"
 
 	#
 	# check for non existing patches
@@ -303,10 +307,12 @@ ptxd_make_world_patchin_apply()
 	# Some tools like "git" skip non existing patches without an
 	# error. In ptxdist we consider this a fatal error.
 	#
-	local patch para junk
+	local patch prefixed para junk
 	while read patch tmp; do
 	    case "${patch}" in
-		""|"#"*) continue ;;	# skip empty lines and comments
+		""|"#"*)
+			echo "${patch} ${tmp}" >> "${pkg_patch_series}.quilt"
+			continue ;;	# skip empty lines and comments
 		*) ;;
 	    esac
 
@@ -316,14 +322,17 @@ ptxd_make_world_patchin_apply()
 		*) ptxd_bailout "invalid parameter to patch '${patch}' in series file '${pkg_patch_series}'"
 	    esac
 
+ 	    prefixed="patches/${patch}"
 	    if [ \! -f "${pkg_patchin_dir}/.ptxdist/patches/${patch}" ]; then
+ 	        prefixed="patches_platform/${patch}"
 	        if [ \! -f "${pkg_patchin_dir}/.ptxdist/patches_platform/${patch}" ]; then
 	            ptxd_bailout "cannot find patch: '${patch}' specified in series file '${pkg_patch_series}'"
 	        fi
 	    fi
+	    echo "${prefixed}" >> "${pkg_patch_series}.quilt"
 
 	done < "${pkg_patchin_dir}/.ptxdist/series" &&
-	unset patch para junk
+	unset patch prefixed para junk
     fi || return
 
     #
