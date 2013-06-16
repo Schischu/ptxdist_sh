@@ -265,7 +265,13 @@ ptxd_kconfig() {
 	fi
 
 	if [ "${part}" == "collection" ]; then
-		sed -i "s/\([^,*]*\)=m/# \1 is not set/g" .config
+		tail -n +8 .config > .tmptailconfig
+		head -n 8 .config > .tmpheadconfig
+		
+		sed -i "s/\([^,*]*\)=m/# \1 is not set/g" .tmptailconfig
+		cat .tmpheadconfig > .config
+		cat .tmptailconfig >> .config
+		rm .tmpheadconfig .tmptailconfig
 	fi
 
 	local conf="${PTXDIST_TOPDIR}/scripts/kconfig/conf"
@@ -326,7 +332,13 @@ ptxd_kconfig() {
 	    FULLVERSION
 
 	if [ "${part}" == "collection" ]; then
-		sed -i "s/# \([^,*]*\) is not set/\1=m/g" .config
+		tail -n +8 .config > .tmptailconfig
+		head -n 8 .config > .tmpheadconfig
+		
+		sed -i "s/# \([^,*]*\) is not set/\1=m/g" .tmptailconfig
+		cat .tmpheadconfig > .config
+		cat .tmptailconfig >> .config
+		rm .tmpheadconfig .tmptailconfig
 	fi
 
 	if [ ${retval} -eq 0 -a "${copy_back}" = "true" ]; then
