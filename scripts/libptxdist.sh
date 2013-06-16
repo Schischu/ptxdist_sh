@@ -265,7 +265,7 @@ ptxd_kconfig() {
 	fi
 
 	if [ "${part}" == "collection" ]; then
-		tail -n +8 .config > .tmptailconfig
+		tail -n +9 .config > .tmptailconfig
 		head -n 8 .config > .tmpheadconfig
 		
 		sed -i "s/\([^,*]*\)=m/# \1 is not set/g" .tmptailconfig
@@ -332,7 +332,7 @@ ptxd_kconfig() {
 	    FULLVERSION
 
 	if [ "${part}" == "collection" ]; then
-		tail -n +8 .config > .tmptailconfig
+		tail -n +9 .config > .tmptailconfig
 		head -n 8 .config > .tmpheadconfig
 		
 		sed -i "s/# \([^,*]*\) is not set/\1=m/g" .tmptailconfig
