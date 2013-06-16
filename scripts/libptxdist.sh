@@ -264,6 +264,10 @@ ptxd_kconfig() {
 		cp -- "${file_dotconfig}" ".config" || return
 	fi
 
+	if [ "${part}" == "collection" ]; then
+		sed -i "s/\([^,*]*\)=m/# \1 is not set/g" .config
+	fi
+
 	local conf="${PTXDIST_TOPDIR}/scripts/kconfig/conf"
 	local mconf="${PTXDIST_TOPDIR}/scripts/kconfig/mconf"
 	local nconf="${PTXDIST_TOPDIR}/scripts/kconfig/nconf"
@@ -322,8 +326,7 @@ ptxd_kconfig() {
 	    FULLVERSION
 
 	if [ "${part}" == "collection" ]; then
-		sed -i "s/# //g" .config
-		sed -i "s/ is not set/=m/g" .config
+		sed -i "s/# \([^,*]*\) is not set/\1=m/g" .config
 	fi
 
 	if [ ${retval} -eq 0 -a "${copy_back}" = "true" ]; then
