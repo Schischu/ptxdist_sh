@@ -175,13 +175,14 @@ export -f ptxd_make_world_patchin_apply_git
 ptxd_make_world_patchin_apply_quilt()
 {
 	# Skip empty series
-	if [ -n "$(cat ${pkg_patch_series}.quilt |grep -v '^[#$]')" ]; then
+	if [ -n "$(cat ${pkg_patch_series_quilt} |grep -v '^[#$]')" ]; then
 
-    QUILT_SERIES="${pkg_patch_series}.quilt" \
+    QUILT_SERIES="${pkg_patch_series_quilt}" \
 	QUILT_PATCHES="${pkg_patchin_dir}/.ptxdist" \
 	quilt push -a || ptxd_bailout "quilt returned error"
 
 	fi
+	ln -s "${PTXDIST_TOPDIR}/scripts/quilt-export.sh" ".ptxdist/quilt-export.sh"
 }
 export -f ptxd_make_world_patchin_apply_quilt
 
@@ -303,8 +304,15 @@ ptxd_make_world_patchin_apply()
 	fi
     else
 	ln -s "${pkg_patch_series}" "${pkg_patchin_dir}/.ptxdist/series"
+
 	# create new series file for quilt
-	echo > "${pkg_patch_series}.quilt"
+	if [ -w "${pkg_patch_dir}/" ]; then
+		pkg_patch_series_quilt="${pkg_patch_dir}/series.quilt" &&
+		ln -s "${pkg_patch_series_quilt}" "${pkg_patchin_dir}/.ptxdist/series.quilt"
+	else
+		pkg_patch_series_quilt="${pkg_patchin_dir}/.ptxdist/series.quilt"
+	fi
+	cat /dev/null > "${pkg_patch_series_quilt}"
 
 	#
 	# check for non existing patches
@@ -315,8 +323,11 @@ ptxd_make_world_patchin_apply()
 	local patch prefixed para junk
 	while read patch tmp; do
 	    case "${patch}" in
-		""|"#"*)
-			echo "${patch} ${tmp}" >> "${pkg_patch_series}.quilt"
+		"")
+			echo "" >> "${pkg_patch_series_quilt}"
+			continue ;;	# skip empty lines and comments
+		"#"*)
+				echo "${patch} ${tmp}" >> "${pkg_patch_series_quilt}"
 			continue ;;	# skip empty lines and comments
 		*) ;;
 	    esac
@@ -334,7 +345,7 @@ ptxd_make_world_patchin_apply()
 	            ptxd_bailout "cannot find patch: '${patch}' specified in series file '${pkg_patch_series}'"
 	        fi
 	    fi
-	    echo "${prefixed}" >> "${pkg_patch_series}.quilt"
+	    echo "${prefixed}" >> "${pkg_patch_series_quilt}"
 
 	done < "${pkg_patchin_dir}/.ptxdist/series" &&
 	unset patch prefixed para junk
