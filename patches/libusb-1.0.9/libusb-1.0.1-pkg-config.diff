@@ -17,11 +17,12 @@ Index: libusb-1.0.1/libusb-1.0.pc.in
 ===================================================================
 --- libusb-1.0.1.orig/libusb-1.0.pc.in
 +++ libusb-1.0.1/libusb-1.0.pc.in
-@@ -6,6 +6,6 @@ includedir=@includedir@
+@@ -6,7 +6,7 @@
  Name: libusb-1.0
- Description: C API for USB device access from Linux userspace
+ Description: C API for USB device access from Linux, Mac OS X, OpenBSD, NetBSD and Windows userspace
  Version: @VERSION@
 -Libs: -L${libdir} -lusb-1.0
 +Libs: -L${libdir} -lusb-1.0 -lrt -lpthread
+ Libs.private: @PC_LIBS_PRIVATE@
  Cflags: -I${includedir}/libusb-1.0
 
