@@ -43,12 +43,14 @@ SQLITE_CONF_ENV := \
 	-DSQLITE_OMIT_LOOKASIDE=1 \
 	-DSQLITE_SECURE_DELETE \
 	-DSQLITE_SOUNDEX=1 \
-	"
+	" \
+	LD="sh4-linux-ld"
 
 SQLITE_AUTOCONF	:= \
 	$(CROSS_AUTOCONF_USR) \
 	$(GLOBAL_LARGE_FILE_OPTION) \
-	--disable-static
+	--disable-static \
+	--enable-shared
 
 ifdef PTXCONF_SQLITE_THREADSAFE
 SQLITE_AUTOCONF += --enable-threadsafe
