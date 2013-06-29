@@ -41,6 +41,9 @@ ifdef PTXCONF_ROOTFS_DEV_INITIAL
 	@$(call install_node, rootfs, 0, 0, 0666, c, 1, 3, /dev/null)
 	@$(call install_node, rootfs, 0, 0, 0666, c, 1, 5, /dev/zero)
 	@$(call install_node, rootfs, 0, 0, 0600, c, 5, 1, /dev/console)
+ifdef PTXCONF_ARCH_SH
+	@$(call install_node, rootfs, 0, 0, 0600, c, 204, 40, /dev/ttyAS0)
+endif
 endif
 ifdef PTXCONF_ROOTFS_HOME
 	@$(call install_copy, rootfs, 0, 0, 2775, /home)
