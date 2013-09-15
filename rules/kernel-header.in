@@ -3,6 +3,7 @@
 menuconfig KERNEL_HEADER
 	tristate
 	select BASE
+	select HOST_SYSTEM_PERL
 	prompt "Linux kernel headers          "
 	help
 	  Kernel headers used to build tools that need newer kernel
@@ -13,12 +14,12 @@ if KERNEL_HEADER
 config KERNEL_HEADER_VERSION
 	prompt "kernel version"
 	string
-	default "2.6.39"
+	default "${PTXCONF_KERNEL_VERSION}"
 
 config KERNEL_HEADER_MD5
 	prompt "kernel source md5sum"
 	string
-	default "1aab7a741abe08d42e8eccf20de61e05"
+	default "${PTXCONF_KERNEL_MD5}"
 
 endif
 

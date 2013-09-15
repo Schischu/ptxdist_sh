@@ -16,12 +16,8 @@ PACKAGES-$(PTXCONF_BUSYBOX) += busybox
 #
 # Paths and names
 #
-#BUSYBOX_VERSION	:= 1.20.2
-#BUSYBOX_MD5	:= e025414bc6cd79579cc7a32a45d3ae1c
-
 BUSYBOX_VERSION	:= 1.21.0
 BUSYBOX_MD5	:= d613f2e4b580305c1de8691f7b84285e
-
 BUSYBOX		:= busybox-$(BUSYBOX_VERSION)
 BUSYBOX_SUFFIX	:= tar.bz2
 BUSYBOX_URL	:= http://www.busybox.net/downloads/$(BUSYBOX).$(BUSYBOX_SUFFIX)
@@ -55,12 +51,11 @@ BUSYBOX_MAKE_OPT := \
 	V=$(PTXDIST_VERBOSE) \
 	ARCH=$(PTXCONF_ARCH_STRING) \
 	SUBARCH=$(PTXCONF_ARCH_STRING) \
-	CROSS_COMPILE=$(COMPILER_PREFIX) \
-	HOSTCC=$(HOSTCC)
+	CROSS_COMPILE=$(COMPILER_PREFIX)
 
 BUSYBOX_MAKE_ENV := \
 	$(CROSS_ENV) \
-	CFLAGS="$(CROSS_CFLAGS) -I$(KERNEL_HEADERS_INCLUDE_DIR)" \
+	CFLAGS="-I$(KERNEL_HEADERS_INCLUDE_DIR)" \
 	SKIP_STRIP=y
 
 BUSYBOX_INSTALL_ENV := \
@@ -238,7 +233,7 @@ ifdef PTXCONF_BUSYBOX_CROND
 endif
 
 ifdef PTXCONF_BUSYBOX_BB_SYSCTL
-	@$(call install_alternative, busybox, 0, 0, 0755, /etc/sysctl.conf)
+	@$(call install_alternative, busybox, 0, 0, 0644, /etc/sysctl.conf)
 endif
 
 	@$(call install_finish, busybox)

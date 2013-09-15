@@ -17,11 +17,11 @@ PACKAGES-$(PTXCONF_UTIL_LINUX_NG) += util-linux-ng
 #
 # Paths and names
 #
-UTIL_LINUX_NG_VERSION	:= 2.21.2
-UTIL_LINUX_NG_MD5	:= b75b3cfecb943f74338382fde693c2c3
+UTIL_LINUX_NG_VERSION	:= 2.23.1
+UTIL_LINUX_NG_MD5	:= 33ba55ce82f8e3b8d7a38fac0f62779a
 UTIL_LINUX_NG		:= util-linux-$(UTIL_LINUX_NG_VERSION)
-UTIL_LINUX_NG_SUFFIX	:= tar.bz2
-UTIL_LINUX_NG_URL	:= $(call ptx/mirror, KERNEL, utils/util-linux/v2.21/$(UTIL_LINUX_NG).$(UTIL_LINUX_NG_SUFFIX))
+UTIL_LINUX_NG_SUFFIX	:= tar.xz
+UTIL_LINUX_NG_URL	:= $(call ptx/mirror, KERNEL, utils/util-linux/v2.23/$(UTIL_LINUX_NG).$(UTIL_LINUX_NG_SUFFIX))
 UTIL_LINUX_NG_SOURCE	:= $(SRCDIR)/$(UTIL_LINUX_NG).$(UTIL_LINUX_NG_SUFFIX)
 UTIL_LINUX_NG_DIR	:= $(BUILDDIR)/$(UTIL_LINUX_NG)
 UTIL_LINUX_NG_LICENSE	:= GPLv2, GPLv2+, GPLv3+, LGPLv2+, BSD, public_domain
@@ -51,53 +51,77 @@ UTIL_LINUX_NG_AUTOCONF := \
 	$(GLOBAL_LARGE_FILE_OPTION) \
 	--disable-nls \
 	--disable-rpath \
+	--disable-static-programs \
 	--enable-tls \
 	--disable-most-builds \
 	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_LIBUUID)-libuuid \
 	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_LIBBLKID)-libblkid \
 	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_LIBMOUNT)-libmount \
-	--enable-mount \
+	--disable-deprecated-mount \
+	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_MOUNT)-mount \
 	--disable-losetup \
-	--disable-libmount-mount \
-	--disable-new-mount \
+	--disable-cytune \
 	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_FSCK)-fsck \
 	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_PARTX_TOOLS)-partx \
 	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_UUIDD)-uuidd \
 	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_MOUNTPOINT)-mountpoint \
 	--disable-fallocate \
 	--disable-unshare \
-	--disable-arch \
-	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_DDATE)-ddate \
+	--disable-nsenter \
+	--disable-setpriv \
+	--disable-eject \
 	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_AGETTY)-agetty \
 	--disable-cramfs \
+	--disable-bfs \
+	--disable-fdformat \
+	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_HWCLOCK)-hwclock \
+	--disable-wdctl \
 	--disable-switch_root \
 	--disable-pivot_root \
 	--disable-elvtune \
+	--disable-tunelp \
 	--disable-kill \
 	--disable-last \
+	--disable-utmpdump \
 	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_LINE)-line \
 	--disable-mesg \
 	--disable-raw \
 	--disable-rename \
 	--disable-reset \
-	--disable-login-utils \
-	--enable-schedutils \
-	--disable-wall \
-	--disable-write \
+	--disable-vipw \
+	--disable-newgrp \
+	--disable-chfn-chsh-password \
+	--disable-chfn-chsh \
 	--disable-chsh-only-listed \
+	--disable-login \
 	--disable-login-chown-vcs \
 	--disable-login-stat-mail \
+	--disable-sulogin \
+	--disable-su \
+	--disable-runuser \
+	--disable-ul \
+	--disable-more \
+	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_SETTERM)-setterm \
+	--disable-pg \
+	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_SCHEDUTILS)-schedutils \
+	--disable-wall \
+	--disable-write \
+	--disable-socket-activation \
+	--disable-bash-completion \
 	--disable-pg-bell \
-	--disable-require-password \
 	--disable-use-tty-group \
+	--disable-sulogin-emergency-mount \
 	--disable-makeinstall-chown \
 	--disable-makeinstall-setuid \
+	--without-libiconv-prefix \
+	--without-libintl-prefix \
 	--without-selinux \
 	--without-audit \
 	--without-udev \
 	--$(call ptx/wwo, PTXCONF_UTIL_LINUX_NG_USES_NCURSES)-ncurses \
 	--without-slang \
-	--without-utempter
+	--without-utempter \
+	--without-user
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -117,9 +141,6 @@ ifdef PTXCONF_UTIL_LINUX_NG_COLUMN
 endif
 ifdef PTXCONF_UTIL_LINUX_NG_LINE
 	@$(call install_copy, util-linux-ng, 0, 0, 0755, -, /usr/bin/line)
-endif
-ifdef PTXCONF_UTIL_LINUX_NG_DDATE
-	@$(call install_copy, util-linux-ng, 0, 0, 0755, -, /usr/bin/ddate)
 endif
 ifdef PTXCONF_UTIL_LINUX_NG_MOUNTPOINT
 	@$(call install_copy, util-linux-ng, 0, 0, 0755, -, /bin/mountpoint)
@@ -187,6 +208,9 @@ ifdef PTXCONF_UTIL_LINUX_NG_TASKSET
 endif
 ifdef PTXCONF_UTIL_LINUX_NG_MCOOKIE
 	@$(call install_copy, util-linux-ng, 0, 0, 0755, -, /usr/bin/mcookie)
+endif
+ifdef PTXCONF_UTIL_LINUX_NG_LDATTACH
+	@$(call install_copy, util-linux-ng, 0, 0, 0755, -, /usr/sbin/ldattach)
 endif
 ifdef PTXCONF_UTIL_LINUX_NG_LIBBLKID
 	@$(call install_lib, util-linux-ng, 0, 0, 0644, libblkid)

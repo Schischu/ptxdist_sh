@@ -17,31 +17,29 @@ PACKAGES-$(PTXCONF_LM_SENSORS) += lm_sensors
 #
 # Paths and names
 #
-LM_SENSORS_VERSION	:= 3.1.2
-LM_SENSORS_MD5		:= 58a9a225808ac4587c4c8cbd12b40b5c
+LM_SENSORS_VERSION	:= 3.3.3
+LM_SENSORS_MD5		:= 73c2fcccdab6049d289c5e0c596192a1
 LM_SENSORS		:= lm_sensors-$(LM_SENSORS_VERSION)
 LM_SENSORS_SUFFIX	:= tar.bz2
 LM_SENSORS_URL		:= http://dl.lm-sensors.org/lm-sensors/releases/$(LM_SENSORS).$(LM_SENSORS_SUFFIX)
 LM_SENSORS_SOURCE	:= $(SRCDIR)/$(LM_SENSORS).$(LM_SENSORS_SUFFIX)
 LM_SENSORS_DIR		:= $(BUILDDIR)/$(LM_SENSORS)
-LM_SENSORS_LICENSE	:= GPLv2+
+LM_SENSORS_LICENSE	:= GPLv2+, LGPLv2.1+
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
-LM_SENSORS_PATH	:= PATH=$(CROSS_PATH)
-LM_SENSORS_ENV 	:= $(CROSS_ENV)
-
-LM_SENSORS_MAKEVARS := \
+LM_SENSORS_CONF_TOOL	:= NO
+LM_SENSORS_MAKE_OPT	:= \
 	PREFIX=/usr \
 	LIBICONV="" \
 	MACHINE=$(PTXCONF_ARCH_STRING) \
 	$(CROSS_ENV_CC)
 
-$(STATEDIR)/lm_sensors.prepare:
-	@$(call targetinfo)
-	@$(call touch)
+LM_SENSORS_INSTALL_OPT	:= \
+	$(LM_SENSORS_MAKE_OPT) \
+	install
 
 # ----------------------------------------------------------------------------
 # Target-Install

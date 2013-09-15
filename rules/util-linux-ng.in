@@ -26,6 +26,9 @@ config UTIL_LINUX_NG_USES_NCURSES
 config UTIL_LINUX_NG_PARTX_TOOLS
 	bool
 
+config UTIL_LINUX_NG_SCHEDUTILS
+	bool
+
 config UTIL_LINUX_NG_AGETTY
 	bool
 	prompt "agetty"
@@ -75,12 +78,6 @@ config UTIL_LINUX_NG_MOUNTPOINT
 
 comment "BusyBox' mountpoint is selected!"
 	depends on BUSYBOX_MOUNTPOINT
-
-config UTIL_LINUX_NG_DDATE
-	bool
-	prompt "ddate"
-	help
-	  The ddate utility.
 
 config UTIL_LINUX_NG_FDISK
 	bool
@@ -135,6 +132,7 @@ comment "BusyBox' swapon is selected!"
 config UTIL_LINUX_NG_MOUNT
 	bool
 	prompt "mount"
+	select UTIL_LINUX_NG_LIBMOUNT
 	depends on !BUSYBOX_MOUNT || ALLYES
 	help
 	  The mount command serves to attach the file system
@@ -146,6 +144,8 @@ comment "BusyBox' mount is selected!"
 config UTIL_LINUX_NG_UMOUNT
 	bool
 	prompt "umount"
+	select UTIL_LINUX_NG_MOUNT
+	depends on !BUSYBOX_MOUNT || ALLYES
 	depends on !BUSYBOX_UMOUNT || ALLYES
 	help
 	  The mount(8) command serves to attach the file system
@@ -158,6 +158,7 @@ comment "BusyBox' umount is selected!"
 config UTIL_LINUX_NG_FSCK
 	bool
 	prompt "fsck"
+	select UTIL_LINUX_NG_LIBMOUNT
 	depends on !BUSYBOX_FSCK || ALLYES
 	help
 	  fsck  is  used  to  check and optionally repair one or
@@ -217,6 +218,7 @@ config UTIL_LINUX_NG_SETTERM
 config UTIL_LINUX_NG_CHRT
 	bool
 	prompt "chrt"
+	select UTIL_LINUX_NG_SCHEDUTILS
 	depends on !BUSYBOX_CHRT || ALLYES
 	help
 	  chrt manipulates the real-time attributes of a process.
@@ -240,12 +242,14 @@ comment "BusyBox' hwclock is selected!"
 config UTIL_LINUX_NG_IONICE
 	bool
 	prompt "ionice"
+	select UTIL_LINUX_NG_SCHEDUTILS
 	help
 	  ionice gets/sets the program io scheduling class and priority.
 
 config UTIL_LINUX_NG_TASKSET
 	bool
 	prompt "taskset"
+	select UTIL_LINUX_NG_SCHEDUTILS
 	depends on !BUSYBOX_TASKSET || ALLYES
 	help
 	  taskset retrieves or sets a process's CPU affinity.
@@ -259,6 +263,12 @@ config UTIL_LINUX_NG_MCOOKIE
 	help
 	  mcookie generates a 128-bit random hexadecimal number for
 	  use with the X authority system.
+
+config UTIL_LINUX_NG_LDATTACH
+	bool
+	prompt "ldattach"
+	help
+	  attach a line discipline to a serial line
 
 config UTIL_LINUX_NG_UUIDD
 	bool

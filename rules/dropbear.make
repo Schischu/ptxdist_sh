@@ -18,8 +18,8 @@ PACKAGES-$(PTXCONF_DROPBEAR) += dropbear
 #
 # Paths and names
 #
-DROPBEAR_VERSION	:= 2012.55
-DROPBEAR_MD5		:= 8c784baec3054cdb1bb4bfa792c87812
+DROPBEAR_VERSION	:= 2013.56
+DROPBEAR_MD5		:= 700f1ae51ff008486465968db692b6dc
 DROPBEAR		:= dropbear-$(DROPBEAR_VERSION)
 DROPBEAR_SUFFIX		:= tar.bz2
 DROPBEAR_URL		:= http://matt.ucc.asn.au/dropbear/releases/$(DROPBEAR).$(DROPBEAR_SUFFIX)
@@ -34,8 +34,7 @@ DROPBEAR_DIR		:= $(BUILDDIR)/$(DROPBEAR)
 # autoconf
 #
 DROPBEAR_AUTOCONF := \
-	$(CROSS_AUTOCONF_USR) \
-	--disable-nls
+	$(CROSS_AUTOCONF_USR)
 
 ifdef PTXCONF_DROPBEAR_ZLIB
 DROPBEAR_AUTOCONF	+= --enable-zlib
@@ -69,10 +68,6 @@ endif
 
 ifdef PTXCONF_DROPBEAR_DIS_WTMPX
 DROPBEAR_AUTOCONF	+= --disable-wtmpx
-endif
-
-ifdef PTXCONF_DROPBEAR_DIS_LIBUTIL
-DROPBEAR_AUTOCONF	+= --disable-libutil
 endif
 
 ifdef PTXCONF_DROPBEAR_DIS_PUTUTLINE
@@ -111,10 +106,12 @@ endif
 
 ifdef PTXCONF_DROPBEAR_DIS_AGENT
 	@echo "ptxdist: disabling agent"
-	@$(call disable_c, $(DROPBEAR_DIR)/options.h,ENABLE_AGENTFWD)
+	@$(call disable_c, $(DROPBEAR_DIR)/options.h,ENABLE_SVR_AGENTFWD)
+	@$(call disable_c, $(DROPBEAR_DIR)/options.h,ENABLE_CLI_AGENTFWD)
 else
 	@echo "ptxdist: enabling agent"
-	@$(call enable_c, $(DROPBEAR_DIR)/options.h,ENABLE_AGENTFWD)
+	@$(call enable_c, $(DROPBEAR_DIR)/options.h,ENABLE_SVR_AGENTFWD)
+	@$(call enable_c, $(DROPBEAR_DIR)/options.h,ENABLE_CLI_AGENTFWD)
 endif
 
 
@@ -184,6 +181,22 @@ else
 	@$(call disable_c, $(DROPBEAR_DIR)/options.h,DROPBEAR_SHA1_96_HMAC)
 endif
 
+ifdef PTXCONF_DROPBEAR_SHA256
+	@echo "ptxdist: enabling sha256"
+	@$(call enable_c, $(DROPBEAR_DIR)/options.h,DROPBEAR_SHA2_256_HMAC)
+else
+	@echo "ptxdist: disabling sha256"
+	@$(call disable_c, $(DROPBEAR_DIR)/options.h,DROPBEAR_SHA2_256_HMAC)
+endif
+
+ifdef PTXCONF_DROPBEAR_SHA512
+	@echo "ptxdist: enabling sha512"
+	@$(call enable_c, $(DROPBEAR_DIR)/options.h,DROPBEAR_SHA2_512_HMAC)
+else
+	@echo "ptxdist: disabling sha512"
+	@$(call disable_c, $(DROPBEAR_DIR)/options.h,DROPBEAR_SHA2_512_HMAC)
+endif
+
 ifdef PTXCONF_DROPBEAR_MD5
 	@echo "ptxdist: enabling md5"
 	@$(call enable_c, $(DROPBEAR_DIR)/options.h,DROPBEAR_MD5_HMAC)
@@ -211,18 +224,22 @@ endif
 
 ifdef PTXCONF_DROPBEAR_PASSWD
 	@echo "ptxdist: enabling passwd"
-	@$(call enable_c, $(DROPBEAR_DIR)/options.h,DROPBEAR_PASSWORD_AUTH)
+	@$(call enable_c, $(DROPBEAR_DIR)/options.h,ENABLE_SVR_PASSWORD_AUTH)
+	@$(call enable_c, $(DROPBEAR_DIR)/options.h,ENABLE_CLI_PASSWORD_AUTH)
 else
 	@echo "ptxdist: disabling passwd"
-	@$(call disable_c, $(DROPBEAR_DIR)/options.h,DROPBEAR_PASSWORD_AUTH)
+	@$(call disable_c, $(DROPBEAR_DIR)/options.h,ENABLE_SVR_PASSWORD_AUTH)
+	@$(call disable_c, $(DROPBEAR_DIR)/options.h,ENABLE_CLI_PASSWORD_AUTH)
 endif
 
 ifdef PTXCONF_DROPBEAR_PUBKEY
 	@echo "ptxdist: enabling pubkey"
-	@$(call enable_c, $(DROPBEAR_DIR)/options.h,DROPBEAR_PUBKEY_AUTH)
+	@$(call enable_c, $(DROPBEAR_DIR)/options.h,ENABLE_SVR_PUBKEY_AUTH)
+	@$(call enable_c, $(DROPBEAR_DIR)/options.h,ENABLE_CLI_PUBKEY_AUTH)
 else
 	@echo "ptxdist: disabling pubkey"
-	@$(call disable_c, $(DROPBEAR_DIR)/options.h,DROPBEAR_PUBKEY_AUTH)
+	@$(call disable_c, $(DROPBEAR_DIR)/options.h,ENABLE_SVR_PUBKEY_AUTH)
+	@$(call disable_c, $(DROPBEAR_DIR)/options.h,ENABLE_CLI_PUBKEY_AUTH)
 endif
 
 	@$(call touch)
