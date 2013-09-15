@@ -17,8 +17,8 @@ PACKAGES-$(PTXCONF_NET_SNMP) += net-snmp
 #
 # Paths and names
 #
-NET_SNMP_VERSION	:= 5.6.1
-NET_SNMP_MD5		:= b4e30ead5783b0bb1d280172c6095ea4
+NET_SNMP_VERSION	:= 5.7.2
+NET_SNMP_MD5		:= 5bddd02e2f82b62daa79f82717737a14
 NET_SNMP		:= net-snmp-$(NET_SNMP_VERSION)
 NET_SNMP_SUFFIX		:= tar.gz
 NET_SNMP_URL		:= $(call ptx/mirror, SF, net-snmp/$(NET_SNMP).$(NET_SNMP_SUFFIX))
@@ -50,7 +50,16 @@ NET_SNMP_AUTOCONF := \
 	--enable-shared \
 	--disable-embedded-perl \
 	--without-perl-modules \
-	--disable-static
+	--disable-static \
+	--disable-privacy \
+	--disable-internal-md5 \
+	--$(call ptx/endis, PTXCONF_NET_SNMP_DOM_SOCK_ONLY)-agentx-dom-sock-only \
+	--disable-mib-config-checking \
+	--disable-mfd-rewrites \
+	--disable-testing-code \
+	--disable-reentrant \
+	--disable-embedded-perl \
+	--disable-ucd-snmp-compatibility
 
 ifdef PTXCONF_ENDIAN_LITTLE
 NET_SNMP_AUTOCONF += --with-endianness=little
@@ -144,60 +153,6 @@ else
 NET_SNMP_AUTOCONF += --disable-developer
 endif
 
-ifdef PTXCONF_NET_SNMP_PRIVACY
-NET_SNMP_AUTOCONF += --enable-privacy
-else
-NET_SNMP_AUTOCONF += --disable-privacy
-endif
-
-ifdef PTXCONF_NET_SNMP_INTERNAL_MD5
-NET_SNMP_AUTOCONF += --enable-internal-md5
-else
-NET_SNMP_AUTOCONF += --disable-internal-md5
-endif
-
-ifdef PTXCONF_NET_SNMP_AGENTX_DOM_SOCK_ONLY
-NET_SNMP_AUTOCONF += --enable-agentx-dom-sock-only
-else
-NET_SNMP_AUTOCONF += --disable-agentx-dom-sock-only
-endif
-
-ifdef PTXCONF_NET_SNMP_MIB_CONFIG_CHECKING
-NET_SNMP_AUTOCONF += --enable-mib-config-checking
-else
-NET_SNMP_AUTOCONF += --disable-mib-config-checking
-endif
-
-ifdef PTXCONF_NET_SNMP_MFD_REWRITES
-NET_SNMP_AUTOCONF += --enable-mfd-rewrites
-else
-NET_SNMP_AUTOCONF += --disable-mfd-rewrites
-endif
-
-ifdef PTXCONF_NET_SNMP_TESTING_CODE
-NET_SNMP_AUTOCONF += --enable-testing-code
-else
-NET_SNMP_AUTOCONF += --disable-testing-code
-endif
-
-ifdef PTXCONF_NET_SNMP_REENTRANT
-NET_SNMP_AUTOCONF += --enable-reentrant
-else
-NET_SNMP_AUTOCONF += --disable-reentrant
-endif
-
-ifdef PTXCONF_NET_SNMP_EMBEDDED_PERL
-NET_SNMP_AUTOCONF += --enable-embedded-perl
-else
-NET_SNMP_AUTOCONF += --disable-embedded-perl
-endif
-
-ifdef PTXCONF_NET_SNMP_UCD_COMPAT
-NET_SNMP_AUTOCONF += --enable-ucd-snmp-compatibility
-else
-NET_SNMP_AUTOCONF += --disable-ucd-snmp-compatibility
-endif
-
 ##NET_SNMP_AUTOCONF	+= --with-mib-modules=mibII
 ##NET_SNMP_AUTOCONF	+= --with-sys-contact=root@localhost
 ##NET_SNMP_AUTOCONF	+= --with-sys-location=unknown
@@ -240,14 +195,15 @@ NET_SNMP_RFCMIBS := IF-MIB.txt IF-INVERTED-STACK-MIB.txt \
 			SNMP-USM-DH-OBJECTS-MIB.txt
 
 NET_SNMP_NETSNMPMIBS := NET-SNMP-TC.txt NET-SNMP-MIB.txt NET-SNMP-AGENT-MIB.txt \
-			NET-SNMP-EXAMPLES-MIB.txt NET-SNMP-EXTEND-MIB.txt
+			NET-SNMP-EXAMPLES-MIB.txt NET-SNMP-EXTEND-MIB.txt \
+			NET-SNMP-PASS-MIB.txt
 
 NET_SNMP_UCDMIBS := UCD-SNMP-MIB.txt UCD-DEMO-MIB.txt UCD-IPFWACC-MIB.txt \
 			UCD-DLMOD-MIB.txt UCD-DISKIO-MIB.txt
 
 ## FIXME:  for now, you need to manually edit this list to represent what mibs to install on target.
 NET_SNMP_MIBS := $(NET_SNMP_V1MIBS) $(NET_SNMP_V2MIBS) $(NET_SNMP_V3MIBS) \
-	$(NET_SNMP_AGENTMIBS) $(NET_SNMP_IANAMIBS) $(NET_SNMP_RFCMIBS) $(NET_SNMP_NETSNMPMIBS) $(NET_SNNP_UCDMIBS)
+	$(NET_SNMP_AGENTMIBS) $(NET_SNMP_IANAMIBS) $(NET_SNMP_RFCMIBS) $(NET_SNMP_NETSNMPMIBS) $(NET_SNMP_UCDMIBS)
 
 $(STATEDIR)/net-snmp.targetinstall:
 	@$(call targetinfo)

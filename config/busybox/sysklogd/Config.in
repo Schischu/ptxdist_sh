@@ -136,6 +136,9 @@ config BUSYBOX_KLOGD
 	  you wish to record the messages produced by the kernel,
 	  you should enable this option.
 
+comment "klogd should not be used together with syslog to kernel printk buffer"
+	depends on BUSYBOX_KLOGD && BUSYBOX_FEATURE_KMSG_SYSLOG
+
 config BUSYBOX_FEATURE_KLOGD_KLOGCTL
 	bool "Use the klogctl() interface"
 	default y

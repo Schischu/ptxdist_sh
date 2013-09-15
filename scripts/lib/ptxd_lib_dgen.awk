@@ -199,15 +199,7 @@ function write_include(this_PKG) {
 	#
 	# include this rules file
 	#
-	
-	#If there is more than on PACKAGE- line in a .make file we do not want to include this file
-	# several times as we get a lot of warnings.
-	#This checks if file has been already included and if so doesn't include it another time.
-	pkgfilename = PKG_to_filename[this_PKG];
-	if (!(pkgfilename in pkgfilename_included)) {
-		print "include " pkgfilename			> DGEN_RULESFILES_MAKE;
-		pkgfilename_included[pkgfilename] = 1;
-	}
+	print "include " PKG_to_filename[this_PKG]			> DGEN_RULESFILES_MAKE;
 }
 
 function write_vars_pkg_all(this_PKG, this_pkg, prefix) {

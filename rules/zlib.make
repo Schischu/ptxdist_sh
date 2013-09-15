@@ -17,10 +17,10 @@ PACKAGES-$(PTXCONF_ZLIB) += zlib
 #
 # Paths and names
 #
-ZLIB_VERSION	:= 1.2.7
-ZLIB_MD5	:= 2ab442d169156f34c379c968f3f482dd
+ZLIB_VERSION	:= 1.2.8
+ZLIB_MD5	:= 28f1205d8dd2001f26fec1e8c2cebe37
 ZLIB		:= zlib-$(ZLIB_VERSION)
-ZLIB_SUFFIX	:= tar.bz2
+ZLIB_SUFFIX	:= tar.xz
 ZLIB_URL	:= \
 	http://zlib.net/$(ZLIB).$(ZLIB_SUFFIX) \
 	$(call ptx/mirror, SF, libpng/$(ZLIB).$(ZLIB_SUFFIX))
@@ -34,21 +34,17 @@ ZLIB_LICENSE	:= zlib
 
 ZLIB_CONF_ENV := \
 	$(CROSS_ENV) \
-	CROSS_PREFIX=$(PTXCONF_COMPILER_PREFIX) \
-	CFLAGS="$(CROSS_CPPFLAGS) -O2 -g"
+	CROSS_PREFIX=$(PTXCONF_COMPILER_PREFIX)
 
 #
 # autoconf
 #
-ZLIB_AUTOCONF := \
+ZLIB_CONF_TOOL := autoconf
+ZLIB_CONF_OPT := \
 	--prefix=/usr \
 	--uname=Linux \
+	$(call ptx/ifdef, PTXCONF_ZLIB_STATIC,--static) \
 	--libdir=/usr/$(CROSS_LIB_DIR)
-
-ifdef PTXCONF_ZLIB_STATIC
-ZLIB_AUTOCONF += --static
-endif
-
 
 # ----------------------------------------------------------------------------
 # Target-Install

@@ -73,6 +73,144 @@ export -f ptxd_make_get_http
 
 
 #
+# in env:
+#
+# ${path}	: local file name
+# ${url}	: the url to download
+# ${opts[]}	: an array of options
+#
+ptxd_make_get_git() {
+	set -- "${opts[@]}"
+	unset opts
+	local tag
+	local mirror="${url#[a-z]*//}"
+	mirror="$(dirname "${path}")/${mirror//\//.}"
+	local prefix="$(basename "${path}")"
+	prefix="${prefix%.tar.*}/"
+
+	case "${path}" in
+	*.tar.gz|*.tar.bz2|*.tar.xz|*.zip)
+		;;
+	*)
+		ptxd_bailout "Only .tar.gz, .tar.bz2, .tar.xz and .zip archives are supported for git downloads."
+		;;
+	esac
+
+	#
+	# scan for valid options
+	#
+	while [ ${#} -ne 0 ]; do
+		local opt="${1}"
+		shift
+
+		case "${opt}" in
+			tag=*)
+				tag="${opt#tag=}"
+				;;
+			*)
+				ptxd_bailout "invalid option '${opt}' to ${FUNCNAME}"
+				;;
+		esac
+	done
+	unset opt
+
+	if [ -z "${tag}" ]; then
+		ptxd_bailout "git url '${url}' has no 'tag' option"
+	fi
+
+	echo "${PROMPT}git: fetching '${url} into '${mirror}'..."
+	if [ ! -d "${mirror}" ]; then
+		git init --bare --shared "${mirror}"
+	else
+		git --git-dir="${mirror}" remote remove origin
+	fi
+	# overwrite everything so the git repository is in a defined state
+	git --git-dir="${mirror}" config transfer.fsckObjects true &&
+	git --git-dir="${mirror}" config tar.tar.bz2.command "bzip2 -c" &&
+	git --git-dir="${mirror}" config tar.tar.xz.command "xz -c"
+	git --git-dir="${mirror}" remote add origin "${url}" &&
+	git --git-dir="${mirror}" fetch --progress -pf origin "+refs/*:refs/*"  &&
+
+	if ! git --git-dir="${mirror}" rev-parse --verify -q "${tag}" > /dev/null; then
+		ptxd_bailout "git: tag '${tag}' not found in '${url}'"
+	fi &&
+
+	git --git-dir="${mirror}" archive --prefix="${prefix}" -o "${path}" "${tag}"
+}
+export -f ptxd_make_get_git
+
+
+#
+# in env:
+#
+# ${path}	: local file name
+# ${url}	: the url to download
+# ${opts[]}	: an array of options
+#
+ptxd_make_get_svn() {
+	set -- "${opts[@]}"
+	unset opts
+	local rev
+	local tarcomp
+	local mirror="${url#[a-z]*//}"
+	mirror="$(dirname "${path}")/${mirror//\//.}"
+	local prefix="$(basename "${path}")"
+	prefix="${prefix%.tar.*}"
+
+	case "${path}" in
+	*.tar.gz)
+		tarcomp="--gzip"
+		;;
+	*.tar.bz2)
+		tarcomp="--bzip2"
+		;;
+	*.tar.xz)
+		tarcomp="--xz"
+		;;
+	*)
+		ptxd_bailout "Only .tar.gz, .tar.bz2, .tar.xz and archives are supported for svn downloads."
+		;;
+	esac
+
+	#
+	# scan for valid options
+	#
+	while [ ${#} -ne 0 ]; do
+		local opt="${1}"
+		shift
+
+		case "${opt}" in
+			rev=*)
+				rev="${opt#rev=}"
+				;;
+			*)
+				ptxd_bailout "invalid option '${opt}' to ${FUNCNAME}"
+				;;
+		esac
+	done
+	unset opt
+
+	if [ -z "${rev}" ]; then
+		ptxd_bailout "svn url '${url}' has no 'rev' option"
+	fi
+
+	echo "${PROMPT}svn: fetching '${url} into '${mirror}'..."
+	if [ ! -d "${mirror}" ]; then
+		svn checkout -r ${rev} "${url}" "${mirror}"
+	else
+		svn update -r ${rev} "${mirror}"
+	fi &&
+	lmtime=$(svn info -r ${rev} "${mirror}" | \
+		awk '/^Last Changed Date:/ {print $4 " " $5 " " $6}') &&
+	echo "${PROMPT}svn: last modification time '${lmtime}'" &&
+	tar --exclude-vcs --show-stored-names ${tarcomp} \
+		--mtime="${lmtime}" --transform "s|^\.|${prefix}|g" \
+		--create --file "${path}" -C "${mirror}" .
+}
+export -f ptxd_make_get_svn
+
+
+#
 # check if download is disabled
 #
 # in env:
@@ -154,6 +292,30 @@ ptxd_make_get() {
 				mrd=true
 			fi
 			;;
+		git://*|http://*".git;"*|https://*".git;"*)
+			# restrict donwload only to the PTXMIRROR
+			if [ -z "${PTXCONF_SETUP_PTXMIRROR_ONLY}" ]; then
+				# keep original URL
+				argv[${#argv[@]}]="${url}"
+			fi
+			# add mirror to URLs, but only once
+			if ! ${mrd}; then
+				ptxmirror_url="${path/#\/*\//${PTXCONF_SETUP_PTXMIRROR}/}"
+				mrd=true
+			fi
+			;;
+		svn://*)
+			# restrict donwload only to the PTXMIRROR
+			if [ -z "${PTXCONF_SETUP_PTXMIRROR_ONLY}" ]; then
+				# keep original URL
+				argv[${#argv[@]}]="${url}"
+			fi
+			# add mirror to URLs, but only once
+			if ! ${mrd}; then
+				ptxmirror_url="${path/#\/*\//${PTXCONF_SETUP_PTXMIRROR}/}"
+				mrd=true
+			fi
+			;;
 		http://*|https://*|ftp://*)
 			# restrict donwload only to the PTXMIRROR
 			if [ -z "${PTXCONF_SETUP_PTXMIRROR_ONLY}" ]; then
@@ -196,6 +358,14 @@ ptxd_make_get() {
 		shift
 
 		case "${url}" in
+		git://*|http://*.git|https://*.git)
+			ptxd_make_get_download_permitted &&
+			ptxd_make_get_git && return
+			;;
+		svn://*)
+			ptxd_make_get_download_permitted &&
+			ptxd_make_get_svn && return
+			;;
 		http://*|https://*|ftp://*)
 			ptxd_make_get_download_permitted &&
 			ptxd_make_get_http && return
