@@ -1,1 +1,1 @@
-/home/schpuntik/workdir/Public/BSP.Stlinux/ptxdist_sh/patches/autogen.sh
+../autogen.sh
