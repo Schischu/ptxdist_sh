@@ -139,7 +139,78 @@ ptxd_make_get_git() {
 }
 export -f ptxd_make_get_git
 
+#
+# in env:
+#
+# ${path}	: local file name
+# ${url}	: the url to download
+# ${opts[]}	: an array of options
 
+ptxd_make_clone_git() {
+	set -- "${opts[@]}"
+	echo "url =$url"
+	echo "git =$git"
+	echo "path =$path"
+	unset opts
+	local prefix="$(basename "${path}")"
+	
+	echo "${PROMPT}git: clone '${git}' into '${path}'...test"
+	if [ -z "${path}" ]; then
+		git clone "${git}" "${path}"
+	fi
+	
+}
+export -f ptxd_make_clone_git
+
+#
+# in env:
+#
+# ${path}	: local file name
+# ${url}	: the url to download
+# ${opts[]}	: an array of options
+#
+ptxd_make_check_svn() {
+	set -- "${opts[@]}"
+	echo "url =$url"
+	echo "svn =$svn"
+	echo "rev =$rev"
+	echo "path =$path"
+	unset opts
+	local prefix="$(basename "${path}")"
+
+	#
+	# scan for valid options
+	#
+	while [ ${#} -ne 0 ]; do
+		local opt="${1}"
+		shift
+
+		case "${opt}" in
+			rev=*)
+				rev="${opt#rev=}"
+				;;
+			*)
+				ptxd_bailout "invalid option '${opt}' to ${FUNCNAME}"
+				;;
+		esac
+	done
+	unset opt
+
+	if [ -z "${rev}" ]; then
+		ptxd_bailout "svn url '${svn}' has no 'rev' option"
+	fi
+
+	echo "${PROMPT}svn: fetching '${svn} into '${path}'..."
+	if [ ! -d "${path}" ]; then
+		svn checkout -r ${rev} "${svn}" "${path}"
+	else
+		svn update -r ${rev} "${path}"
+	fi &&
+	lmtime=$(svn info -r ${rev} "${path}" | \
+		awk '/^Last Changed Date:/ {print $4 " " $5 " " $6}') &&
+	echo "${PROMPT}svn: last modification time '${lmtime}'"
+}
+export -f ptxd_make_check_svn
 #
 # in env:
 #
@@ -258,6 +329,10 @@ ptxd_make_get() {
 	local mrd=false		# is mirror already part of urls?
 
 	local path="${1}"
+	local url="${2}"
+	local git="${3}"
+	local svn="${4}"
+	local rev="${5}"
 	shift
 
 	local -a orig_argv
@@ -293,6 +368,30 @@ ptxd_make_get() {
 			fi
 			;;
 		git://*|http://*".git;"*|https://*".git;"*)
+			# restrict donwload only to the PTXMIRROR
+			if [ -z "${PTXCONF_SETUP_PTXMIRROR_ONLY}" ]; then
+				# keep original URL
+				argv[${#argv[@]}]="${url}"
+			fi
+			# add mirror to URLs, but only once
+			if ! ${mrd}; then
+				ptxmirror_url="${path/#\/*\//${PTXCONF_SETUP_PTXMIRROR}/}"
+				mrd=true
+			fi
+			;;
+		clone://*)
+			# restrict donwload only to the PTXMIRROR
+			if [ -z "${PTXCONF_SETUP_PTXMIRROR_ONLY}" ]; then
+				# keep original URL
+				argv[${#argv[@]}]="${url}"
+			fi
+			# add mirror to URLs, but only once
+			if ! ${mrd}; then
+				ptxmirror_url="${path/#\/*\//${PTXCONF_SETUP_PTXMIRROR}/}"
+				mrd=true
+			fi
+			;;
+		check://*)
 			# restrict donwload only to the PTXMIRROR
 			if [ -z "${PTXCONF_SETUP_PTXMIRROR_ONLY}" ]; then
 				# keep original URL
@@ -361,6 +460,12 @@ ptxd_make_get() {
 		git://*|http://*.git|https://*.git)
 			ptxd_make_get_download_permitted &&
 			ptxd_make_get_git && return
+			;;
+		clone://*)
+			ptxd_make_clone_git && return
+			;;
+		check://*)
+			ptxd_make_check_svn && return
 			;;
 		svn://*)
 			ptxd_make_get_download_permitted &&

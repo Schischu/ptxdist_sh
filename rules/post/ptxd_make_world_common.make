@@ -66,6 +66,12 @@ world/env/impl = \
 	pkg_md5="$(call ptx/escape,$($(1)_MD5))"				\
 	pkg_url="$(call ptx/escape,$($(1)_URL))"				\
 										\
+	pkg_git="$(call ptx/escape,$($(1)_GIT))"				\
+	pkg_git_branch="$(call ptx/escape,$($(1)_GIT_BRANCH))"			\
+	pkg_git_head="$(call ptx/escape,$($(1)_GIT_HEAD))"			\
+	pkg_svn="$(call ptx/escape,$($(1)_SVN))"				\
+	pkg_svn_rev="$(call ptx/escape,$($(1)_SVN_REV))"			\
+										\
 	pkg_dir="$(call ptx/escape,$($(1)_DIR))"				\
 	pkg_subdir="$(call ptx/escape,$($(1)_SUBDIR))"				\
 	pkg_strip_level="$(call ptx/escape,$($(1)_STRIP_LEVEL))"		\

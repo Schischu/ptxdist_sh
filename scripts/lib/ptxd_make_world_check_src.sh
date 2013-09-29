@@ -89,7 +89,7 @@ export -f ptxd_make_world_update_md5
 ptxd_make_world_check_src() {
     ptxd_make_world_init &&
 
-    if [ -z "${pkg_src}" ]; then
+    if [ -z "${pkg_src}" ] || [ -z "${pkg_svn}" ] || [ -z "${pkg_git}" ]; then
         return
     fi
     ptxd_make_check_src_impl "${pkg_src}" "${pkg_md5}" && return

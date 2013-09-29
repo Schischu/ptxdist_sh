@@ -55,6 +55,20 @@ ptxd_make_world_extract() {
 		ptxd_bailout "the URL '${pkg_url}' points to non existing directory or file."
 	    fi
 	    ;;
+	 clone://*)
+	        echo "Clone git"
+		echo "head=$pkg_git_head"
+		cp -a "${pkg_src}" "${pkg_dir}"
+		cd ${pkg_dir} && git fetch && git checkout "${pkg_git_branch}" && git pull -u origin "${pkg_git_branch}" && git checkout "${pkg_git_head}"
+		return
+	    ;;
+	 check://*)
+	        echo "Checkout svn"
+		echo "revision=$pkg_svn_rev"
+		cp -a "${pkg_src}" "${pkg_dir}"
+		cd ${pkg_dir} && svn update && svn up -r "${pkg_svn_rev}"
+		return
+	    ;;
     esac
 
     mkdir -p "${pkg_extract_dir}" || return
