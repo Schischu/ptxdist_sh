@@ -155,7 +155,7 @@ ptxd_make_clone_git() {
 	local prefix="$(basename "${path}")"
 	
 	echo "${PROMPT}git: clone '${git}' into '${path}'...test"
-	if [ -z "${path}" ]; then
+	if [ ! -z "${path}" ]; then
 		git clone "${git}" "${path}"
 	fi
 	
