@@ -87,6 +87,16 @@ ptxd_make_get_git() {
 	mirror="$(dirname "${path}")/${mirror//\//.}"
 	local prefix="$(basename "${path}")"
 	prefix="${prefix%.tar.*}/"
+	
+	#
+	# scan for git options
+	#
+	if [ -z "${pkg_git_head}" ] || [ -z "${pkg_git_branch}" ]; then
+		echo "${PROMPT}git: clone '${url}' into '${path}'...test"
+		if [ ! -z "${path}" ]; then
+			git clone "${url}" "${path}"
+		fi
+	else
 
 	case "${path}" in
 	*.tar.gz|*.tar.bz2|*.tar.xz|*.zip)
@@ -136,82 +146,10 @@ ptxd_make_get_git() {
 	fi &&
 
 	git --git-dir="${mirror}" archive --prefix="${prefix}" -o "${path}" "${tag}"
+	fi
 }
 export -f ptxd_make_get_git
 
-#
-# in env:
-#
-# ${path}	: local file name
-# ${url}	: the url to download
-# ${opts[]}	: an array of options
-
-ptxd_make_clone_git() {
-	set -- "${opts[@]}"
-	echo "url =$url"
-	echo "git =$git"
-	echo "path =$path"
-	unset opts
-	local prefix="$(basename "${path}")"
-	
-	echo "${PROMPT}git: clone '${git}' into '${path}'...test"
-	if [ ! -z "${path}" ]; then
-		git clone "${git}" "${path}"
-	fi
-	
-}
-export -f ptxd_make_clone_git
-
-#
-# in env:
-#
-# ${path}	: local file name
-# ${url}	: the url to download
-# ${opts[]}	: an array of options
-#
-ptxd_make_check_svn() {
-	set -- "${opts[@]}"
-	echo "url =$url"
-	echo "svn =$svn"
-	echo "rev =$rev"
-	echo "path =$path"
-	unset opts
-	local prefix="$(basename "${path}")"
-
-	#
-	# scan for valid options
-	#
-	while [ ${#} -ne 0 ]; do
-		local opt="${1}"
-		shift
-
-		case "${opt}" in
-			rev=*)
-				rev="${opt#rev=}"
-				;;
-			*)
-				ptxd_bailout "invalid option '${opt}' to ${FUNCNAME}"
-				;;
-		esac
-	done
-	unset opt
-
-	if [ -z "${rev}" ]; then
-		ptxd_bailout "svn url '${svn}' has no 'rev' option"
-	fi
-
-	echo "${PROMPT}svn: fetching '${svn} into '${path}'..."
-	if [ ! -d "${path}" ]; then
-		svn checkout -r ${rev} "${svn}" "${path}"
-	else
-		svn update -r ${rev} "${path}"
-	fi &&
-	lmtime=$(svn info -r ${rev} "${path}" | \
-		awk '/^Last Changed Date:/ {print $4 " " $5 " " $6}') &&
-	echo "${PROMPT}svn: last modification time '${lmtime}'"
-}
-export -f ptxd_make_check_svn
-#
 # in env:
 #
 # ${path}	: local file name
@@ -222,61 +160,67 @@ ptxd_make_get_svn() {
 	set -- "${opts[@]}"
 	unset opts
 	local rev
+	echo "alles=$@"
+	echo "mirror=$mirror"
+	echo "rev=$rev"
+	echo "tarcomp=$opts"
+
+	if [ -z "${pkg_svn_rev}" ]; then
+			echo "${PROMPT}svn: fetching '${url} into '${path}'... checkout"
+			echo "rev=$rev"
+			echo "url=$url"
+			echo "alles=$@"
+		if [ ! -d "${path}" ]; then
+			svn checkout "${url}" "${path}"
+		else
+			svn update -r ${rev} "${path}"
+		fi &&
+		lmtime=$(svn info -r ${rev} "${path}" | \
+		awk '/^Last Changed Date:/ {print $4 " " $5 " " $6}') &&
+		echo "${PROMPT}svn: last modification time '${lmtime}'"
+	
+	else
 	local tarcomp
 	local mirror="${url#[a-z]*//}"
 	mirror="$(dirname "${path}")/${mirror//\//.}"
 	local prefix="$(basename "${path}")"
 	prefix="${prefix%.tar.*}"
-
-	case "${path}" in
-	*.tar.gz)
+	
+		case "${path}" in
+		*.tar.gz)
 		tarcomp="--gzip"
-		;;
-	*.tar.bz2)
-		tarcomp="--bzip2"
-		;;
-	*.tar.xz)
-		tarcomp="--xz"
-		;;
-	*)
-		ptxd_bailout "Only .tar.gz, .tar.bz2, .tar.xz and archives are supported for svn downloads."
-		;;
-	esac
-
-	#
-	# scan for valid options
-	#
-	while [ ${#} -ne 0 ]; do
-		local opt="${1}"
-		shift
-
-		case "${opt}" in
-			rev=*)
-				rev="${opt#rev=}"
-				;;
-			*)
-				ptxd_bailout "invalid option '${opt}' to ${FUNCNAME}"
-				;;
+			;;
+		*.tar.bz2)
+			tarcomp="--bzip2"
+			;;
+		*.tar.xz)
+			tarcomp="--xz"
+			;;
+		*)
+			ptxd_bailout "Only .tar.gz, .tar.bz2, .tar.xz and archives are supported for svn downloads."
+			;;
 		esac
-	done
-	unset opt
 
-	if [ -z "${rev}" ]; then
-		ptxd_bailout "svn url '${url}' has no 'rev' option"
-	fi
 
-	echo "${PROMPT}svn: fetching '${url} into '${mirror}'..."
-	if [ ! -d "${mirror}" ]; then
-		svn checkout -r ${rev} "${url}" "${mirror}"
-	else
-		svn update -r ${rev} "${mirror}"
-	fi &&
-	lmtime=$(svn info -r ${rev} "${mirror}" | \
-		awk '/^Last Changed Date:/ {print $4 " " $5 " " $6}') &&
-	echo "${PROMPT}svn: last modification time '${lmtime}'" &&
-	tar --exclude-vcs --show-stored-names ${tarcomp} \
+		unset opt
+
+		if [ -z "${rev}" ]; then
+			ptxd_bailout "svn url '${url}' has no 'rev' option"
+		fi
+
+		echo "${PROMPT}svn: fetching '${url} into '${mirror}'..."
+		if [ ! -d "${mirror}" ]; then
+			 svn checkout -r ${rev} "${url}" "${mirror}"
+		else
+			 svn update -r ${rev} "${mirror}"
+		fi &&
+		lmtime=$(svn info -r ${rev} "${mirror}" | \
+			 awk '/^Last Changed Date:/ {print $4 " " $5 " " $6}') &&
+		echo "${PROMPT}svn: last modification time '${lmtime}'" &&
+		tar --exclude-vcs --show-stored-names ${tarcomp} \
 		--mtime="${lmtime}" --transform "s|^\.|${prefix}|g" \
 		--create --file "${path}" -C "${mirror}" .
+	fi
 }
 export -f ptxd_make_get_svn
 
@@ -330,9 +274,10 @@ ptxd_make_get() {
 
 	local path="${1}"
 	local url="${2}"
-	local git="${3}"
-	local svn="${4}"
-	local rev="${5}"
+	local rev="${3}"
+	echo "rev=$rev"
+	echo "alles=$@"
+	
 	shift
 
 	local -a orig_argv
@@ -367,31 +312,7 @@ ptxd_make_get() {
 				mrd=true
 			fi
 			;;
-		git://*|http://*".git;"*|https://*".git;"*)
-			# restrict donwload only to the PTXMIRROR
-			if [ -z "${PTXCONF_SETUP_PTXMIRROR_ONLY}" ]; then
-				# keep original URL
-				argv[${#argv[@]}]="${url}"
-			fi
-			# add mirror to URLs, but only once
-			if ! ${mrd}; then
-				ptxmirror_url="${path/#\/*\//${PTXCONF_SETUP_PTXMIRROR}/}"
-				mrd=true
-			fi
-			;;
-		clone://*)
-			# restrict donwload only to the PTXMIRROR
-			if [ -z "${PTXCONF_SETUP_PTXMIRROR_ONLY}" ]; then
-				# keep original URL
-				argv[${#argv[@]}]="${url}"
-			fi
-			# add mirror to URLs, but only once
-			if ! ${mrd}; then
-				ptxmirror_url="${path/#\/*\//${PTXCONF_SETUP_PTXMIRROR}/}"
-				mrd=true
-			fi
-			;;
-		check://*)
+		git://*|git@*|http://*".git;"*|https://*".git;"*)
 			# restrict donwload only to the PTXMIRROR
 			if [ -z "${PTXCONF_SETUP_PTXMIRROR_ONLY}" ]; then
 				# keep original URL
@@ -457,15 +378,9 @@ ptxd_make_get() {
 		shift
 
 		case "${url}" in
-		git://*|http://*.git|https://*.git)
+		git://*|git@*)
 			ptxd_make_get_download_permitted &&
 			ptxd_make_get_git && return
-			;;
-		clone://*)
-			ptxd_make_clone_git && return
-			;;
-		check://*)
-			ptxd_make_check_svn && return
 			;;
 		svn://*)
 			ptxd_make_get_download_permitted &&
