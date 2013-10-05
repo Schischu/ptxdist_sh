@@ -52,6 +52,17 @@ ptxd_init_arch() {
 		    ;;
 	    esac
 	    ;;
+	sh)
+	    local target="$(ptxd_get_ptxconf PTXCONF_GNU_TARGET)"
+		    case "${target}" in
+		sh*-linux)
+		    ipkg_arch=sh4
+		    ;;
+		*)
+		    ipkg_arch=sh4
+		    ;;
+	    esac
+	    ;;
     esac
 
     PTXDIST_IPKG_ARCH_STRING="${ipkg_arch}"
