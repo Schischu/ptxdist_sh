@@ -22,13 +22,14 @@ ptxd_make_world_extract() {
 	
 	pkg_extract_dir="${pkg_deprecated_extract_dir:-${pkg_extract_dir}}"
 	
-	#echo "pkg_src=${pkg_src}"
-	#echo "pkg_dir=${pkg_dir}"
-	#echo "pkg_extract_dir=${pkg_extract_dir}"
+	echo "pkg_src=${pkg_src}"
+	echo "pkg_dir=${pkg_dir}"
+	echo "pkg_extract_dir=${pkg_extract_dir}"
+	echo "pkg_subdir=${pkg_subdir}"
 	
 	pkg_subdir=${pkg_dir#${pkg_extract_dir}}
 	
-	#echo "pkg_subdir=${pkg_subdir}"
+	echo "pkg_subdir=${pkg_subdir}"
 	
 	if [ ! "${pkg_subdir}" == "/`basename ${pkg_subdir}`" ]; then
 		echo "dir autocorrection"
@@ -47,7 +48,7 @@ ptxd_make_world_extract() {
 		if [ -d "${url}" ]; then
 			echo "local directory using lndir"
 			mkdir -p "${pkg_dir}"
-			lndir "$(ptxd_abspath \"${url}\")" "${pkg_dir}"
+			lndir "$(ptxd_abspath "${url}")" "${pkg_dir}"
 		return
 		else
 			ptxd_bailout "the URL '${pkg_url}' points to non existing directory."
@@ -60,7 +61,7 @@ ptxd_make_world_extract() {
 		fi
 		if [ -d "${url}" ]; then
 			echo "local directory instead of tar file, linking build dir"
-			ln -sf "$(ptxd_abspath \"${url}\")" "${pkg_dir}"
+			ln -sf "$(ptxd_abspath "${url}")" "${pkg_dir}"
 			return
 		elif [ -f "${url}" ]; then
 			echo
