@@ -66,7 +66,6 @@ NET_SNMP_AUTOCONF := \
 	--disable-testing-code \
 	--disable-reentrant \
 	--disable-ucd-snmp-compatibility
-	--disable-ucd-snmp-compatibility
 
 ifdef PTXCONF_ENDIAN_LITTLE
 NET_SNMP_AUTOCONF += --with-endianness=little
