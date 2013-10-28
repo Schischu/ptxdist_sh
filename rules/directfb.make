@@ -17,16 +17,16 @@ PACKAGES-$(PTXCONF_DIRECTFB) += directfb
 #
 # Paths and names
 #
-DIRECTFB_VERSION	:= 1.4.3
-DIRECTFB_MD5		:= 223e036da906ceb4bd44708026839ff1
-DIRECTFB		:= DirectFB-$(DIRECTFB_VERSION)
-DIRECTFB_SUFFIX		:= tar.gz
+DIRECTFB_VERSION	:= 1.6.3
+DIRECTFB_MD5		:= bc6703bda1ab85f1d85a1633aa7de3a5
+DIRECTFB			:= DirectFB-$(DIRECTFB_VERSION)
+DIRECTFB_SUFFIX		:= tar.bz2
 DIRECTFB_SOURCE		:= $(SRCDIR)/$(DIRECTFB).$(DIRECTFB_SUFFIX)
 DIRECTFB_DIR		:= $(BUILDDIR)/$(DIRECTFB)
 
 DIRECTFB_URL		:= \
-	http://www.directfb.org/downloads/Core/DirectFB-1.4/$(DIRECTFB).$(DIRECTFB_SUFFIX) \
-	http://www.directfb.org/downloads/Old/$(DIRECTFB).$(DIRECTFB_SUFFIX)
+	http://ptxdist.sat-universum.de/$(DIRECTFB).$(DIRECTFB_SUFFIX)
+
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -41,6 +41,7 @@ DIRECTFB_INPUT-$(PTXCONF_DIRECTFB_INPUT_KEYBOARD)	+= keyboard
 DIRECTFB_INPUT-$(PTXCONF_DIRECTFB_INPUT_LINUXINPUT)	+= linuxinput
 DIRECTFB_INPUT-$(PTXCONF_DIRECTFB_INPUT_PS2MOUSE)	+= ps2mouse
 DIRECTFB_INPUT-$(PTXCONF_DIRECTFB_INPUT_TSLIB)		+= tslib
+DIRECTFB_INPUT-$(PTXCONF_DIRECTFB_INPUT_ENIMGA2REMOTE)		+= enigma2remote
 
 
 DIRECTFB_GFX-$(PTXCONF_DIRECTFB_GFX_ATI128)		+= ati128
@@ -69,15 +70,20 @@ DIRECTFB_GFX-$(PTXCONF_DIRECTFB_GFX_VMWARE)		+= vmware
 #
 DIRECTFB_AUTOCONF := \
 	$(CROSS_AUTOCONF_USR) \
-	--without-tests \
+	--enable-static \
+	--with-tests \
 	--with-tools \
 	--disable-osx \
 	--disable-network \
+	--disable-multicore \
 	--disable-multi \
-	--disable-voodoo \
+	--enable-voodoo \
+	--disable-devmem \
 	--disable-sdl \
+	--disable-webp \
+	--with-message-size=65536 \
+	--disable-linotype \
 	--disable-vnc \
-	--disable-sysfs \
 	--disable-zlib \
 	--with-gfxdrivers=$(subst $(space),$(comma),$(DIRECTFB_GFX-y)) \
 	--with-inputdrivers=$(subst $(space),$(comma),$(DIRECTFB_INPUT-y))
@@ -94,6 +100,12 @@ else
 DIRECTFB_AUTOCONF += --disable-fbdev
 endif
 
+ifdef PTXCONF_DIRECTFB_STMFBDEV
+DIRECTFB_AUTOCONF += --enable-stmfbdev
+else
+DIRECTFB_AUTOCONF += --disable-stmfbdev
+endif
+
 ifdef PTXCONF_DIRECTFB_V4L
 DIRECTFB_AUTOCONF += --enable-video4linux
 else
@@ -108,16 +120,22 @@ endif
 
 ifdef PTXCONF_DIRECTFB_DEBUG
 DIRECTFB_AUTOCONF += --enable-debug
-DIRECTFB_MODULE_DIRECTORY := /usr/lib/directfb-1.4-0
+DIRECTFB_MODULE_DIRECTORY := /usr/lib/directfb-1.6-0
 else
 DIRECTFB_AUTOCONF += --disable-debug-support
-DIRECTFB_MODULE_DIRECTORY := /usr/lib/directfb-1.4-0-pure
+DIRECTFB_MODULE_DIRECTORY := /usr/lib/directfb-1.6-0-pure
 endif
 
 ifdef PTXCONF_DIRECTFB_TRACE
 DIRECTFB_AUTOCONF += --enable-trace
 else
 DIRECTFB_AUTOCONF += --disable-trace
+endif
+
+ifdef PTXCONF_DIRECTFB_MME
+DIRECTFB_AUTOCONF += --enable-mme
+else
+DIRECTFB_AUTOCONF += --disable-mme
 endif
 
 ifdef PTXCONF_DIRECTFB_WM_UNIQUE
@@ -148,6 +166,12 @@ ifdef PTXCONF_DIRECTFB_FONT_FREETYPE
 DIRECTFB_AUTOCONF += --enable-freetype
 else
 DIRECTFB_AUTOCONF += --disable-freetype
+endif
+
+ifdef PTXCONF_DIRECTFB_FONT_LINOTYPE
+DIRECTFB_AUTOCONF += --enable-linotype
+else
+DIRECTFB_AUTOCONF += --disable-linotype
 endif
 
 # ----------------------------------------------------------------------------
@@ -194,12 +218,13 @@ endif
 
 	@$(call install_copy, directfb, 0, 0, 0755, -, /usr/bin/dfbinfo)
 
-	@$(call install_lib, directfb, 0, 0, 0644, libdirectfb-1.4)
-	@$(call install_lib, directfb, 0, 0, 0644, libfusion-1.4)
-	@$(call install_lib, directfb, 0, 0, 0644, libdirect-1.4)
+	@$(call install_lib, directfb, 0, 0, 0644, libdirectfb-1.6)
+	@$(call install_lib, directfb, 0, 0, 0644, libfusion-1.6)
+	@$(call install_lib, directfb, 0, 0, 0644, libdirect-1.6)
+	@$(call install_lib, directfb, 0, 0, 0644, libvoodoo-1.6)
 
 ifdef PTXCONF_DIRECTFB_WM_UNIQUE
-	@$(call install_lib, directfb, 0, 0, 0644, libuniquewm-1.4)
+	@$(call install_lib, directfb, 0, 0, 0644, libuniquewm-1.6)
 endif
 
 	@cd $(DIRECTFB_PKGDIR) && for plugin in `find ./$(DIRECTFB_MODULE_DIRECTORY) -name "*.so"`; do \

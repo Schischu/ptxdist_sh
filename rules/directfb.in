@@ -1,9 +1,9 @@
 ## SECTION=multimedia_directfb
 
 menuconfig DIRECTFB
-	tristate
-	prompt "directfb                      "
-
+	tristate 
+	prompt "directfb"
+	select HOST_FLUXCOMP
 	select HOST_DIRECTFB
 	select MENU_XORG_FONTS
 	select LIBPNG		if DIRECTFB_IMAGE_PNG
@@ -39,6 +39,9 @@ config DIRECTFB_X11
 config DIRECTFB_FBDEV
 	bool "Framebuffer Device support"
 
+config DIRECTFB_STMFBDEV
+	bool "STM Framebuffer Device support"
+
 config DIRECTFB_V4L
 	bool "Video for Linux support"
 
@@ -47,6 +50,12 @@ config DIRECTFB_V4L2
 
 config DIRECTFB_FONT_FREETYPE
 	bool "build freetype2 font provider"
+
+config DIRECTFB_FONT_LINOTYPE
+	bool "build linotype font provider"
+
+config DIRECTFB_MME
+	bool "build with mme support"
 
 config DIRECTFB_WM_UNIQUE
 	bool "enable unique (wm module)"
@@ -151,6 +160,9 @@ config DIRECTFB_INPUT_PS2MOUSE
 
 config DIRECTFB_INPUT_TSLIB
 	bool "tslib"
+
+config DIRECTFB_INPUT_ENIMGA2REMOTE
+	bool "enigma2remote"
 
 endmenu
 
