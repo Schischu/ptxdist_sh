@@ -16,7 +16,7 @@ PACKAGES-$(PTXCONF_FLEX) += flex
 #
 # Paths and names
 #
-FLEX_VERSION	:= 2.5.35
+FLEX_VERSION	:= 2.5.37
 FLEX_MD5	:= 10714e50cea54dc7a227e3eddcd44d57
 FLEX		:= flex-$(FLEX_VERSION)
 FLEX_SUFFIX	:= tar.bz2
